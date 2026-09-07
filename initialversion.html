@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ekashman Tiwari — Aerospace Engineering</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          ink: '#0d1210',
+          paper: '#f4f1ea',
+          rust: '#c1531b',
+          teal: '#1c4b45',
+        },
+        fontFamily: {
+          serif: ['Fraunces','Georgia','serif'],
+          mono: ['Space Mono','monospace'],
+          sans: ['Inter','sans-serif'],
+        }
+      }
+    }
+  }
+</script>
+<style>
+  html{scroll-behavior:smooth;}
+  body{background:#f4f1ea; cursor:default;}
+
+  /* ---- flow field canvas: subtle, tucked behind hero only ---- */
+  #flow{position:absolute; inset:0; width:100%; height:100%; z-index:0; opacity:0.9;}
+
+  /* ---- grain for texture, not gloss ---- */
+  .grain{position:fixed; inset:0; z-index:40; pointer-events:none; opacity:.05; mix-blend-mode:multiply;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");}
+
+  /* ---- paper texture: subtle fiber/noise on the light (paper) areas ---- */
+  .paper-texture{position:fixed; inset:0; z-index:1; pointer-events:none; opacity:.05; mix-blend-mode:multiply;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.012 0.4' numOctaves='3' seed='7' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23p)'/%3E%3C/svg%3E");}
+
+  .rule{height:1px; background:currentColor; opacity:.18;}
+
+  /* underline-draw link */
+  .draw-link{position:relative; text-decoration:none;}
+  .draw-link::after{content:'';position:absolute;left:0;bottom:-3px;width:100%;height:1px;background:currentColor;
+    transform:scaleX(0); transform-origin:right; transition:transform .45s cubic-bezier(.65,0,.35,1);}
+  .draw-link:hover::after{transform:scaleX(1); transform-origin:left;}
+
+  /* word-by-word reveal */
+  .word{display:inline-block; opacity:0; filter:blur(6px); transform:translateY(0.4em);
+    transition:opacity .7s cubic-bezier(.2,.7,.2,1), filter .7s cubic-bezier(.2,.7,.2,1), transform .7s cubic-bezier(.2,.7,.2,1);}
+  .word.in{opacity:1; filter:blur(0); transform:translateY(0);}
+
+  .fade-up{opacity:0; transform:translateY(28px); transition:opacity .8s ease, transform .8s ease;}
+  .fade-up.in{opacity:1; transform:translateY(0);}
+
+  .line-draw{position:relative; overflow:hidden;}
+  .line-draw span.bar{position:absolute; inset:0; background:#f4f1ea; transform-origin:left; z-index:2;}
+  .line-draw.in span.bar{animation:wipe .9s cubic-bezier(.65,0,.35,1) forwards;}
+  @keyframes wipe{ to{transform:scaleX(0);} }
+
+  ::selection{background:#0d1210; color:#f4f1ea;}
+
+  .num-mark{font-variant-numeric:tabular-nums;}
+
+  /* portrait: torn-edge photographic frame, not a glossy ring */
+  .photo-frame{position:relative;}
+  .photo-frame::before{
+    content:''; position:absolute; top:14px; left:14px; right:-14px; bottom:-14px;
+    border:1px solid #0d1210; opacity:.35; z-index:-1;
+  }
+
+  .card{border-top:1px solid rgba(13,18,16,.15); transition:border-color .4s;}
+  .card:hover{border-color:rgba(13,18,16,.5);}
+
+  .marquee-track{display:flex; width:max-content; animation:marquee 32s linear infinite;}
+  @keyframes marquee{ to{ transform:translateX(-50%); } }
+
+  nav{ transition:background-color .4s ease, backdrop-filter .4s ease, border-color .4s ease, box-shadow .4s ease; border-bottom:1px solid transparent; }
+  nav.scrolled{ background:rgba(244,241,234,.85); backdrop-filter:blur(10px) saturate(1.1); border-color:rgba(13,18,16,.1); box-shadow:0 8px 30px -18px rgba(13,18,16,.35); }
+  nav.scrolled .nav-invert{ mix-blend-mode:normal; color:#0d1210; }
+  nav .nav-extra{ opacity:0; visibility:hidden; transition:opacity .35s ease; }
+  nav.scrolled .nav-extra{ opacity:1; visibility:visible; }
+
+  .nav-tabs{ counter-reset:tab; }
+  .nav-tabs li{ position:relative; }
+  .nav-tabs li + li::before{
+    counter-increment:tab; content:''; position:absolute; left:-1.4rem; top:50%; translate:0 -50%;
+    width:3px; height:3px; border-radius:50%; background:currentColor; opacity:.35;
+  }
+  .nav-tabs .draw-link{ font-weight:500; }
+  .nav-tabs .draw-link.active{ color:#c1531b; }
+  .nav-tabs .draw-link.active::after{ transform:scaleX(1); background:#c1531b; }
+  nav.scrolled .nav-tabs .draw-link.active{ mix-blend-mode:normal; }
+
+  .menu-link.active{ color:#c1531b; }
+  .menu-link.active::after{ transform:scaleX(1); }
+
+  /* ---- mobile menu ---- */
+  #menu-btn.is-open .menu-bar:nth-child(1){ transform:translateY(6px) rotate(45deg); }
+  #menu-btn.is-open .menu-bar:nth-child(2){ opacity:0; }
+  #menu-btn.is-open .menu-bar:nth-child(3){ transform:translateY(-6px) rotate(-45deg); }
+
+  #mobile-menu.is-open{ pointer-events:auto; }
+  #mobile-menu.is-open #menu-backdrop{ opacity:.55; }
+  #mobile-menu.is-open #menu-panel{ transform:translateX(0); }
+
+  .menu-link{ color:#0d1210; text-decoration:none; display:inline-block; position:relative; }
+  .menu-link::after{ content:''; position:absolute; left:0; bottom:-2px; width:100%; height:1px; background:#c1531b;
+    transform:scaleX(0); transform-origin:right; transition:transform .4s cubic-bezier(.65,0,.35,1); }
+  .menu-link:hover::after{ transform:scaleX(1); transform-origin:left; }
+  .nav-invert{ color:#f4f1ea; mix-blend-mode:difference; }
+
+  @media (max-width: 767px){ .marquee-track{ animation-duration:18s; } }
+
+  #stars{opacity:.9;}
+
+  /* ---- "down" glow pulse: always animating, no movement ---- */
+  #down-word{ display:inline-block; animation:downGlow 2.6s ease-in-out infinite; }
+  @keyframes downGlow{
+    0%,100%{ text-shadow:0 0 0 rgba(193,83,27,0); }
+    50%{ text-shadow:0 6px 20px rgba(193,83,27,.55); }
+  }
+
+  /* ---- research highlight card ---- */
+  .research-card{ background:#f4f1ea; border:1px solid rgba(13,18,16,.12); border-radius:14px;
+    box-shadow:0 24px 60px -30px rgba(13,18,16,.35), 0 2px 0 rgba(193,83,27,.5) inset;
+    padding:2.25rem clamp(1.25rem,3vw,2.75rem); }
+</style>
+</head>
+<body class="text-ink font-sans antialiased">
+
+<div class="grain"></div>
+<div class="paper-texture"></div>
+
+<nav id="nav" class="fixed top-0 left-0 right-0 z-50">
+  <div class="max-w-6xl mx-auto px-6 md:px-10 flex items-center justify-between h-20 md:h-20">
+    <a href="#top" class="nav-invert font-serif text-xl tracking-tight">Ekashman Tiwari<span class="text-rust">.</span></a>
+    <ul class="nav-tabs nav-extra hidden md:flex items-center gap-x-14 font-mono text-[11px] tracking-[0.18em] uppercase">
+      <li><a href="#about" class="nav-invert draw-link">About</a></li>
+      <li><a href="#highlight" class="nav-invert draw-link">Research</a></li>
+      <li><a href="#education" class="nav-invert draw-link">Education</a></li>
+      <li><a href="#experience" class="nav-invert draw-link">Experience</a></li>
+      <li><a href="#positions" class="nav-invert draw-link">Roles</a></li>
+      <li><a href="#contact" class="nav-invert draw-link">Contact</a></li>
+    </ul>
+    <span class="nav-invert nav-extra font-mono text-[11px] tracking-[0.18em] uppercase hidden md:inline pl-14 border-l border-current/20">IIST &middot; TVM</span>
+
+    <button id="menu-btn" aria-label="Open menu" aria-expanded="false" class="nav-invert nav-extra md:hidden relative w-9 h-9 flex flex-col items-center justify-center gap-[5px]">
+      <span class="menu-bar block w-6 h-px bg-current transition-transform duration-300"></span>
+      <span class="menu-bar block w-6 h-px bg-current transition-opacity duration-200"></span>
+      <span class="menu-bar block w-6 h-px bg-current transition-transform duration-300"></span>
+    </button>
+  </div>
+</nav>
+
+<!-- ============ MOBILE MENU ============ -->
+<div id="mobile-menu" class="fixed inset-0 z-40 md:hidden pointer-events-none">
+  <div id="menu-backdrop" class="absolute inset-0 bg-ink opacity-0 transition-opacity duration-400"></div>
+  <div id="menu-panel" class="absolute inset-y-0 right-0 w-[78%] max-w-xs bg-paper translate-x-full transition-transform duration-500 flex flex-col justify-center px-10" style="transition-timing-function:cubic-bezier(.65,0,.35,1);">
+    <ul class="flex flex-col gap-6 font-serif text-3xl">
+      <li><a href="#about" class="menu-link">About</a></li>
+      <li><a href="#highlight" class="menu-link">Research</a></li>
+      <li><a href="#education" class="menu-link">Education</a></li>
+      <li><a href="#experience" class="menu-link">Experience</a></li>
+      <li><a href="#positions" class="menu-link">Roles</a></li>
+      <li><a href="#contact" class="menu-link">Contact</a></li>
+    </ul>
+    <p class="font-mono text-[11px] tracking-widest uppercase text-ink/60 mt-14">IIST &middot; Thiruvananthapuram</p>
+  </div>
+</div>
+
+<main id="top" class="relative">
+
+  <!-- ============ HERO ============ -->
+  <header class="relative min-h-screen flex items-end overflow-hidden bg-ink text-paper">
+    <canvas id="stars" class="absolute inset-0 w-full h-full z-0"></canvas>
+    <canvas id="flow" class="absolute inset-0 w-full h-full z-0"></canvas>
+
+    <!-- rocket trajectory: confined to hero, behind the headline -->
+    <div id="traj-wrap" class="absolute inset-0 pointer-events-none z-[1]">
+      <svg id="traj-svg" class="w-full h-full block">
+        <path id="trajPath" fill="none" stroke="#c1531b" stroke-opacity="0.35" stroke-width="1.5" stroke-dasharray="2 9" stroke-linecap="round" vector-effect="non-scaling-stroke"/>
+      </svg>
+      <div id="rocket1" class="absolute top-0 left-0">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#c1531b" stroke-width="1.6">
+          <path d="M12 2c3 2.5 4 6 4 10 0 3-1 6-4 9-3-3-4-6-4-9 0-4 1-7.5 4-10z"/>
+          <circle cx="12" cy="9" r="1.5" fill="#c1531b" stroke="none"/>
+          <path d="M8 15l-3 4 4-1.5M16 15l3 4-4-1.5"/>
+        </svg>
+      </div>
+    </div>
+
+    <div class="relative z-10 max-w-6xl mx-auto px-6 md:px-10 pb-16 pt-32 w-full">
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-10 items-end">
+        <div class="md:col-span-8">
+          <p class="font-mono text-xs tracking-[0.25em] uppercase text-rust mb-6">Aerospace Engineering &mdash; B.Tech, IIST</p>
+          <h1 class="font-serif font-medium tracking-tight text-paper" id="hero-title" style="font-size:clamp(1.3rem, 7vw, 6.2rem); line-height:1.02;">
+            <span class="block whitespace-nowrap"><span class="inline-block overflow-hidden pb-[0.06em]"><span class="word">Where</span></span> <span class="inline-block overflow-hidden pb-[0.06em]"><span class="word">liquids</span></span> <span class="inline-block overflow-hidden pb-[0.06em]"><span class="word">forget</span></span></span>
+            <span class="block whitespace-nowrap"><span class="inline-block overflow-hidden pb-[0.06em]"><span class="word">which</span></span> <span class="inline-block overflow-hidden pb-[0.06em]"><span class="word">way</span></span> <span class="inline-block overflow-hidden pb-[0.06em]"><span class="word">is</span></span> <span class="inline-block overflow-hidden pb-[0.06em]"><span class="word italic text-rust" id="down-word">down.</span></span></span>
+          </h1>
+        </div>
+        <div class="md:col-span-4 fade-up">
+          <p class="text-[15px] leading-relaxed max-w-xs md:ml-auto text-paper/90" data-edit-id="hero-subtext">
+            I study how fluids, plasmas and fields behave in microgravity &mdash; and build the small spacecraft that carry those questions into orbit.
+          </p>
+          <a href="#highlight" class="draw-link inline-block mt-6 font-mono text-xs tracking-widest uppercase text-paper" data-edit-id="hero-cta">Latest work &rarr;</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- research tags marquee -->
+  <div class="border-b border-ink/25 py-4 overflow-hidden">
+    <div class="marquee-track font-mono text-xs tracking-widest uppercase text-ink/90 whitespace-nowrap">
+      <span class="px-6">Interfacial Fluid Dynamics</span><span class="px-1">/</span>
+      <span class="px-6">Magnetohydrodynamics</span><span class="px-1">/</span>
+      <span class="px-6">Computational Plasma Physics</span><span class="px-1">/</span>
+      <span class="px-6">CubeSat Thermal Systems</span><span class="px-1">/</span>
+      <span class="px-6">Interfacial Fluid Dynamics</span><span class="px-1">/</span>
+      <span class="px-6">Magnetohydrodynamics</span><span class="px-1">/</span>
+      <span class="px-6">Computational Plasma Physics</span><span class="px-1">/</span>
+      <span class="px-6">CubeSat Thermal Systems</span><span class="px-1">/</span>
+    </div>
+  </div>
+
+  <!-- ============ ABOUT ============ -->
+  <section id="about" class="max-w-6xl mx-auto px-6 md:px-10 py-24 md:py-32 border-b border-ink/25">
+    <div class="grid grid-cols-1 md:grid-cols-12 gap-12">
+      <div class="md:col-span-3 fade-up">
+        <span class="font-mono text-xs text-ink/70 num-mark">01</span>
+        <h2 class="font-serif text-3xl mt-2" data-edit-id="about-heading">About</h2>
+      </div>
+      <div class="md:col-span-6 fade-up">
+        <p class="text-lg md:text-xl leading-relaxed font-serif" data-edit-id="about-lead">
+          I'm an Aerospace Engineering undergraduate at the Indian Institute of Space Science and Technology, Thiruvananthapuram &mdash; currently in my third year.
+        </p>
+        <p class="mt-6 text-[15px] leading-relaxed text-ink/90" data-edit-id="about-body">
+          My research interests sit at the intersection of interfacial fluid dynamics in microgravity conditions, magnetohydrodynamics for space applications, and computational plasma physics. Alongside this, I work on the development of CubeSats under the Small Spacecraft Systems and Payload Centre (SSPACE), IIST, where I'm involved in the thermal subsystem.
+        </p>
+      </div>
+      <div class="md:col-span-3 photo-frame fade-up">
+        <img src="ishqman.png" alt="Ekashman Tiwari" class="w-full aspect-[4/5] object-cover grayscale-[15%] contrast-[1.05]">
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ HIGHLIGHT / RESEARCH ============ -->
+  <section id="highlight" class="max-w-6xl mx-auto px-6 md:px-10 py-24 md:py-32 border-b border-ink/25">
+    <div class="grid grid-cols-1 md:grid-cols-12 gap-12">
+      <div class="md:col-span-3 fade-up">
+        <span class="font-mono text-xs text-ink/70 num-mark">02</span>
+        <h2 class="font-serif text-3xl mt-2" data-edit-id="highlight-heading">Presenting</h2>
+        <button id="edit-add-research" hidden class="mt-6 font-mono text-[11px] tracking-widest uppercase border border-rust text-rust px-3 py-2 rounded-md hover:bg-rust hover:text-paper transition-colors">+ Add research</button>
+      </div>
+      <div class="md:col-span-9 fade-up">
+        <!-- Each .research-item below is real, static markup — what ships in the downloaded
+             index.html is exactly what's here. Only the first is visible by default; the rest
+             (if any) are revealed by the "See all research" button. In edit mode, "+ Add research"
+             clones #research-card-template to append more, and each card gets a delete button. -->
+        <div id="research-list" class="flex flex-col gap-10">
+          <div class="research-card research-item">
+            <p class="font-mono text-xs tracking-widest uppercase text-rust mb-4" data-field="date">5&ndash;7 Oct 2026 &middot; IISc, Bengaluru</p>
+            <h3 class="font-serif text-2xl md:text-3xl leading-snug" data-field="title">&ldquo;Ultrasound-induced wetting dynamics of a molten metallic droplet&rdquo;</h3>
+            <p class="font-mono text-xs tracking-widest uppercase text-ink/70 mt-3" data-field="venue">International Conference on Interfacial Phenomena in Droplets</p>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-10 pt-8 border-t border-ink/25">
+              <div>
+                <p class="font-mono text-[10px] tracking-widest uppercase text-ink/70 mb-1">Supervisor</p>
+                <p class="text-sm" data-field="sup1Name">Prof. V S Sooraj</p>
+                <p class="text-sm text-ink/90" data-field="sup1Dept">Dept. Aerospace Engg., IIST</p>
+              </div>
+              <div>
+                <p class="font-mono text-[10px] tracking-widest uppercase text-ink/70 mb-1">Supervisor</p>
+                <p class="text-sm" data-field="sup2Name">Prof. Sathyan Subbiah</p>
+                <p class="text-sm text-ink/90" data-field="sup2Dept">Dept. Mech. Engg., IIT Madras</p>
+              </div>
+            </div>
+
+            <p class="text-[15px] leading-loose text-ink/90 mt-8 pt-8 border-t border-ink/25" data-field="abstract">The spreading of a liquid droplet results from the combined effect of capillary forces and viscous resistance. Under ultrasonic excitation, additional acoustic forcing can drive liquid motion and significantly alter the spreading dynamics. Here, the spreading and height evolution of a molten metallic droplet subjected to ultrasound of 20&nbsp;kHz are investigated using high-speed imaging. The observed temporal evolution is consistent with previously reported coupling between droplet thinning, acoustic pressure, and cavitation.</p>
+
+            <button class="research-delete mt-6 font-mono text-[11px] tracking-widest uppercase text-rust/80 hover:text-rust" hidden>Delete this project</button>
+          </div>
+        </div>
+        <button id="see-all-research" hidden class="mt-8 font-mono text-xs tracking-widest uppercase draw-link">See all research &rarr;</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- research card template: cloned only when "+ Add research" is used in edit mode -->
+  <template id="research-card-template">
+    <div class="research-card research-item">
+      <p class="font-mono text-xs tracking-widest uppercase text-rust mb-4" data-field="date">Date &middot; Location</p>
+      <h3 class="font-serif text-2xl md:text-3xl leading-snug" data-field="title">New project title</h3>
+      <p class="font-mono text-xs tracking-widest uppercase text-ink/70 mt-3" data-field="venue">Venue / conference</p>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-10 pt-8 border-t border-ink/25">
+        <div>
+          <p class="font-mono text-[10px] tracking-widest uppercase text-ink/70 mb-1">Supervisor</p>
+          <p class="text-sm" data-field="sup1Name">Supervisor name</p>
+          <p class="text-sm text-ink/90" data-field="sup1Dept">Department</p>
+        </div>
+        <div>
+          <p class="font-mono text-[10px] tracking-widest uppercase text-ink/70 mb-1">Supervisor</p>
+          <p class="text-sm" data-field="sup2Name">Supervisor name</p>
+          <p class="text-sm text-ink/90" data-field="sup2Dept">Department</p>
+        </div>
+      </div>
+
+      <p class="text-[15px] leading-loose text-ink/90 mt-8 pt-8 border-t border-ink/25" data-field="abstract">Abstract.</p>
+
+      <button class="research-delete mt-6 font-mono text-[11px] tracking-widest uppercase text-rust/80 hover:text-rust" hidden>Delete this project</button>
+    </div>
+  </template>
+
+  <!-- ============ EDUCATION ============ -->
+  <section id="education" class="max-w-6xl mx-auto px-6 md:px-10 py-24 md:py-32 border-b border-ink/25">
+    <div class="grid grid-cols-1 md:grid-cols-12 gap-12">
+      <div class="md:col-span-3 fade-up">
+        <span class="font-mono text-xs text-ink/70 num-mark">03</span>
+        <h2 class="font-serif text-3xl mt-2" data-edit-id="education-heading">Education</h2>
+      </div>
+      <div class="md:col-span-9">
+        <div class="fade-up grid grid-cols-1 sm:grid-cols-[100px_1fr_auto] gap-x-8 gap-y-1 py-6 border-t border-ink/25 items-baseline">
+          <span class="font-mono text-xs text-ink/70" data-edit-id="edu1-years">2024&ndash;28</span>
+          <div>
+            <p class="font-serif text-xl" data-edit-id="edu1-school">Indian Institute of Space Science and Technology</p>
+            <p class="text-sm text-ink/90 mt-1" data-edit-id="edu1-degree">B.Tech. Aerospace Engineering, Minor in AI/ML</p>
+          </div>
+          <span class="font-mono text-sm text-rust" data-edit-id="edu1-score">9.50 CGPA</span>
+        </div>
+        <div class="fade-up grid grid-cols-1 sm:grid-cols-[100px_1fr_auto] gap-x-8 gap-y-1 py-6 border-t border-ink/25 items-baseline">
+          <span class="font-mono text-xs text-ink/70" data-edit-id="edu2-years">2022&ndash;24</span>
+          <div>
+            <p class="font-serif text-xl" data-edit-id="edu2-school">St. Joseph's School, Shaktinagar</p>
+            <p class="text-sm text-ink/90 mt-1" data-edit-id="edu2-degree">Senior Secondary Education</p>
+          </div>
+          <span class="font-mono text-sm text-rust" data-edit-id="edu2-score">96.0%</span>
+        </div>
+        <div class="fade-up grid grid-cols-1 sm:grid-cols-[100px_1fr_auto] gap-x-8 gap-y-1 py-6 border-t border-b border-ink/25 items-baseline">
+          <span class="font-mono text-xs text-ink/70" data-edit-id="edu3-years">2020&ndash;22</span>
+          <div>
+            <p class="font-serif text-xl" data-edit-id="edu3-school">St. Joseph's School, Shaktinagar</p>
+            <p class="text-sm text-ink/90 mt-1" data-edit-id="edu3-degree">Secondary Education</p>
+          </div>
+          <span class="font-mono text-sm text-rust" data-edit-id="edu3-score">96.4%</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ EXPERIENCE ============ -->
+  <section id="experience" class="max-w-6xl mx-auto px-6 md:px-10 py-24 md:py-32 border-b border-ink/25">
+    <div class="grid grid-cols-1 md:grid-cols-12 gap-12">
+      <div class="md:col-span-3 fade-up">
+        <span class="font-mono text-xs text-ink/70 num-mark">04</span>
+        <h2 class="font-serif text-3xl mt-2" data-edit-id="experience-heading">Experience</h2>
+      </div>
+      <div class="md:col-span-9">
+        <div class="card fade-up grid grid-cols-1 sm:grid-cols-[1fr_auto] gap-2 py-7 items-baseline">
+          <div>
+            <p class="font-serif text-xl" data-edit-id="exp1-title">Thermal Engineer</p>
+            <p class="text-sm text-ink/90 mt-1" data-edit-id="exp1-org">Small Spacecraft Systems and Payload Centre (SSPACE), IIST</p>
+          </div>
+          <span class="font-mono text-xs text-ink/70 whitespace-nowrap" data-edit-id="exp1-dates">Aug 2025 &mdash; Present</span>
+        </div>
+        <div class="card fade-up grid grid-cols-1 sm:grid-cols-[1fr_auto] gap-2 py-7 items-baseline border-b border-ink/25">
+          <div>
+            <p class="font-serif text-xl" data-edit-id="exp2-title">Research Intern</p>
+            <p class="text-sm text-ink/90 mt-1" data-edit-id="exp2-org">Extra Terrestrial Manufacturing Centre, IIT Madras</p>
+          </div>
+          <span class="font-mono text-xs text-ink/70 whitespace-nowrap" data-edit-id="exp2-dates">Jun &mdash; Jul 2026</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ POSITIONS ============ -->
+  <section id="positions" class="max-w-6xl mx-auto px-6 md:px-10 py-24 md:py-32 border-b border-ink/25">
+    <div class="grid grid-cols-1 md:grid-cols-12 gap-12">
+      <div class="md:col-span-3 fade-up">
+        <span class="font-mono text-xs text-ink/70 num-mark">05</span>
+        <h2 class="font-serif text-3xl mt-2" data-edit-id="positions-heading">Roles</h2>
+      </div>
+      <div class="md:col-span-9">
+        <div class="card fade-up grid grid-cols-1 sm:grid-cols-[1fr_auto] gap-2 py-7 items-baseline">
+          <div>
+            <p class="font-serif text-xl" data-edit-id="pos1-title">Finance and Purchase Manager</p>
+            <p class="text-sm text-ink/90 mt-1" data-edit-id="pos1-org">AeroClub, IIST</p>
+          </div>
+          <span class="font-mono text-xs text-ink/70 whitespace-nowrap" data-edit-id="pos1-dates">Aug 2026 &mdash; Present</span>
+        </div>
+        <div class="card fade-up grid grid-cols-1 sm:grid-cols-[1fr_auto] gap-2 py-7 items-baseline">
+          <div>
+            <p class="font-serif text-xl" data-edit-id="pos2-title">Executive Member</p>
+            <p class="text-sm text-ink/90 mt-1" data-edit-id="pos2-org">Aeronautical Society of India &mdash; IIST Student Chapter (APEX)</p>
+          </div>
+          <span class="font-mono text-xs text-ink/70 whitespace-nowrap" data-edit-id="pos2-dates">May 2026 &mdash; Present</span>
+        </div>
+        <div class="card fade-up grid grid-cols-1 sm:grid-cols-[1fr_auto] gap-2 py-7 items-baseline border-b border-ink/25">
+          <div>
+            <p class="font-serif text-xl" data-edit-id="pos3-title">Secretary</p>
+            <p class="text-sm text-ink/90 mt-1" data-edit-id="pos3-org">Neptunes &mdash; Music Club, IIST</p>
+          </div>
+          <span class="font-mono text-xs text-ink/70 whitespace-nowrap" data-edit-id="pos3-dates">May 2026 &mdash; Present</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CONTACT ============ -->
+  <section id="contact" class="max-w-6xl mx-auto px-6 md:px-10 py-24 md:py-32 border-b border-ink/25">
+    <div class="grid grid-cols-1 md:grid-cols-12 gap-12">
+      <div class="md:col-span-3 fade-up">
+        <span class="font-mono text-xs text-ink/70 num-mark">06</span>
+        <h2 class="font-serif text-3xl mt-2" data-edit-id="contact-heading">Contact</h2>
+      </div>
+      <div class="md:col-span-9">
+        <div class="card fade-up grid grid-cols-1 sm:grid-cols-[120px_1fr] gap-2 py-6 items-baseline">
+          <span class="font-mono text-xs text-ink/70 uppercase tracking-widest">Email</span>
+          <a href="mailto:ekashman.sc24b016@ug.iist.ac.in" class="draw-link font-serif text-lg sm:text-xl break-all" data-edit-id="contact-email">ekashman.sc24b016@ug.iist.ac.in</a>
+        </div>
+        <div class="card fade-up grid grid-cols-1 sm:grid-cols-[120px_1fr] gap-2 py-6 items-baseline">
+          <span class="font-mono text-xs text-ink/70 uppercase tracking-widest">GitHub</span>
+          <a href="https://github.com/ekashmantiwari" target="_blank" rel="noopener" class="draw-link font-serif text-lg sm:text-xl" data-edit-id="contact-github">github.com/ekashmantiwari</a>
+        </div>
+        <div class="card fade-up grid grid-cols-1 sm:grid-cols-[120px_1fr] gap-2 py-6 items-baseline">
+          <span class="font-mono text-xs text-ink/70 uppercase tracking-widest">LinkedIn</span>
+          <a href="https://www.linkedin.com/in/ekashman-tiwari-322450313/" target="_blank" rel="noopener" class="draw-link font-serif text-lg sm:text-xl" data-edit-id="contact-linkedin">linkedin.com/in/ekashman-tiwari</a>
+        </div>
+        <div class="card fade-up grid grid-cols-1 sm:grid-cols-[120px_1fr] gap-2 py-6 items-baseline border-b border-ink/25">
+          <span class="font-mono text-xs text-ink/70 uppercase tracking-widest">ORCID</span>
+          <a href="https://orcid.org/0009-0008-9121-0930" target="_blank" rel="noopener" class="draw-link font-serif text-lg sm:text-xl" data-edit-id="contact-orcid">orcid.org/0009-0008-9121-0930</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="max-w-6xl mx-auto px-6 md:px-10 py-14 flex flex-col sm:flex-row justify-between gap-4 font-mono text-xs tracking-widest uppercase text-ink/70">
+    <span data-edit-id="footer-copyright">&copy; 2026 Ekashman Tiwari</span>
+    <span data-edit-id="footer-tagline">Aerospace Engineering, IIST Thiruvananthapuram</span>
+  </footer>
+
+</main>
+
+<script>
+/* ---------------- Hero rocket: follows the cursor with a short trailing trajectory ---------------- */
+(function(){
+  const wrap = document.getElementById('traj-wrap');
+  const svg = document.getElementById('traj-svg');
+  const path = document.getElementById('trajPath');
+  const rocket = document.getElementById('rocket1');
+  const hero = wrap.closest('header');
+
+  let w = 0, h = 0;
+  function resize(){ w = hero.offsetWidth; h = hero.offsetHeight; svg.setAttribute('viewBox', `0 0 ${w} ${h}`); }
+  window.addEventListener('resize', resize);
+  resize();
+
+  const orbit = { cx: 0, cy: 0, rx: 0, ry: 0, t: 0 };
+  function setOrbit(){
+    orbit.cx = w*0.8; orbit.cy = h*0.3;
+    orbit.rx = Math.max(w*0.09, 60); orbit.ry = Math.max(h*0.1, 60);
+  }
+  setOrbit();
+  window.addEventListener('resize', setOrbit);
+
+  let userMoved = false;
+  let idle = true;
+  let lastMoveTime = 0;
+  const IDLE_DELAY = 900;
+  let target = { x: orbit.cx + orbit.rx, y: orbit.cy };
+  let pos = { x: target.x, y: target.y };
+  let angle = -90;
+  const trail = [];
+  const TRAIL_LEN = 9;
+  const hoverCenter = { x: target.x, y: target.y };
+  const hover = { rx: 26, ry: 18, t: Math.random()*10 };
+
+  hero.addEventListener('pointermove', e=>{
+    userMoved = true;
+    idle = false;
+    lastMoveTime = performance.now();
+    const r = hero.getBoundingClientRect();
+    target.x = e.clientX - r.left;
+    target.y = e.clientY - r.top;
+  });
+
+  function tick(){
+    if(!userMoved){
+      orbit.t += 0.006;
+      target.x = orbit.cx + Math.cos(orbit.t) * orbit.rx;
+      target.y = orbit.cy + Math.sin(orbit.t) * orbit.ry;
+    } else if(performance.now() - lastMoveTime > IDLE_DELAY){
+      if(!idle){ idle = true; hoverCenter.x = target.x; hoverCenter.y = target.y; hover.t = 0; }
+      hover.t += 0.035;
+      target.x = hoverCenter.x + Math.cos(hover.t) * hover.rx;
+      target.y = hoverCenter.y + Math.sin(hover.t * 1.7) * hover.ry;
+    }
+
+    const dx = target.x - pos.x, dy = target.y - pos.y;
+    pos.x += dx * 0.08;
+    pos.y += dy * 0.08;
+
+    if(Math.abs(dx) > 0.4 || Math.abs(dy) > 0.4){
+      angle = Math.atan2(dy, dx) * 180/Math.PI;
+    }
+
+    trail.push({ x: pos.x, y: pos.y });
+    if(trail.length > TRAIL_LEN) trail.shift();
+
+    if(trail.length > 1){
+      let d = `M ${trail[0].x} ${trail[0].y}`;
+      for(let i=1;i<trail.length;i++) d += ` L ${trail[i].x} ${trail[i].y}`;
+      path.setAttribute('d', d);
+    }
+
+    rocket.style.transform = `translate(${pos.x}px, ${pos.y}px) rotate(${angle+90}deg) translate(-12px,-12px)`;
+
+    requestAnimationFrame(tick);
+  }
+  tick();
+})();
+
+/* ---------------- Starfield ---------------- */
+(function(){
+  const canvas = document.getElementById('stars');
+  const ctx = canvas.getContext('2d');
+  let w,h,dpr,stars=[];
+  function resize(){
+    dpr = Math.min(window.devicePixelRatio||1,2);
+    w = canvas.clientWidth = canvas.parentElement.offsetWidth;
+    h = canvas.clientHeight = canvas.parentElement.offsetHeight;
+    canvas.width = w*dpr; canvas.height = h*dpr;
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    stars = Array.from({length: Math.round((w*h)/9000)}, ()=>({
+      x: Math.random()*w, y: Math.random()*h,
+      r: Math.random()*1.2+0.3,
+      tw: Math.random()*Math.PI*2,
+      sp: 0.01+Math.random()*0.02
+    }));
+  }
+  window.addEventListener('resize', resize);
+  resize();
+  function draw(){
+    ctx.clearRect(0,0,w,h);
+    stars.forEach(s=>{
+      s.tw += s.sp;
+      const a = 0.4 + Math.sin(s.tw)*0.35;
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI*2);
+      ctx.fillStyle = `rgba(244,241,234,${Math.max(a,0.15)})`;
+      ctx.fill();
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+/* ---------------- Flow-field hero canvas: cursor-reactive streamlines ---------------- */
+(function(){
+  const canvas = document.getElementById('flow');
+  const ctx = canvas.getContext('2d');
+  let w, h, dpr;
+  function resize(){
+    dpr = Math.min(window.devicePixelRatio||1, 2);
+    w = canvas.clientWidth = canvas.parentElement.offsetWidth;
+    h = canvas.clientHeight = canvas.parentElement.offsetHeight;
+    canvas.width = w*dpr; canvas.height = h*dpr;
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  const COLS = 34;
+  const lines = [];
+  for(let i=0;i<COLS;i++){
+    lines.push({
+      xf: i/(COLS-1),
+      phase: Math.random()*1000,
+      phase2: Math.random()*1000,
+      sp: 0.25+Math.random()*0.35,
+      width: 0.8 + Math.random()*1.6,
+      alpha: 0.16 + Math.random()*0.22,
+      tint: Math.random()
+    });
+  }
+
+  let t = 0;
+  function draw(){
+    t += 1;
+    ctx.clearRect(0,0,w,h);
+    ctx.lineCap = 'round';
+
+    lines.forEach((ln, idx)=>{
+      const baseX = ln.xf * w;
+      ctx.beginPath();
+      let prevX = null, prevY = null;
+      for(let y=0; y<=h; y+=8){
+        const wobble = Math.sin(y*0.012 + t*0.012*ln.sp*3 + ln.phase) * (30 + idx%5*4)
+                     + Math.sin(y*0.028 + t*0.006 + ln.phase2) * 14;
+        let x = baseX + wobble;
+
+        if(prevX===null) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+        prevX = x; prevY = y;
+      }
+      const c = ln.tint < 0.5 ? '193,83,27' : '244,241,234';
+      ctx.strokeStyle = `rgba(${c},${ln.alpha})`;
+      ctx.lineWidth = ln.width;
+      ctx.stroke();
+    });
+
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+/* ---------------- word-by-word hero reveal ---------------- */
+window.addEventListener('DOMContentLoaded', ()=>{
+  const words = document.querySelectorAll('#hero-title .word');
+  words.forEach((w,i)=>{
+    setTimeout(()=> w.classList.add('in'), 120 + i*70);
+  });
+});
+
+/* ---------------- scroll reveal ---------------- */
+const io = new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); }
+  });
+},{threshold:0.12});
+document.querySelectorAll('.fade-up').forEach(el=>io.observe(el));
+
+/* ---------------- nav bg on scroll ---------------- */
+const navEl = document.getElementById('nav');
+window.addEventListener('scroll', ()=>{
+  navEl.classList.toggle('scrolled', window.scrollY > 30);
+});
+
+/* ---------------- mobile menu ---------------- */
+(function(){
+  const btn = document.getElementById('menu-btn');
+  const menu = document.getElementById('mobile-menu');
+  const backdrop = document.getElementById('menu-backdrop');
+
+  function openMenu(){
+    btn.classList.add('is-open');
+    btn.setAttribute('aria-expanded','true');
+    menu.classList.add('is-open');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeMenu(){
+    btn.classList.remove('is-open');
+    btn.setAttribute('aria-expanded','false');
+    menu.classList.remove('is-open');
+    document.body.style.overflow = '';
+  }
+
+  btn.addEventListener('click', ()=>{
+    menu.classList.contains('is-open') ? closeMenu() : openMenu();
+  });
+  backdrop.addEventListener('click', closeMenu);
+  document.querySelectorAll('.menu-link').forEach(a=> a.addEventListener('click', closeMenu));
+  window.addEventListener('keydown', e=>{ if(e.key === 'Escape') closeMenu(); });
+})();
+
+/* ---------------- scrollspy: highlight current section in nav ---------------- */
+(function(){
+  const sections = document.querySelectorAll('main section[id], main header[id]');
+  const navLinks = document.querySelectorAll('.nav-tabs .draw-link, .menu-link');
+  if(!sections.length || !navLinks.length) return;
+
+  const spy = new IntersectionObserver((entries)=>{
+    entries.forEach(entry=>{
+      if(!entry.isIntersecting) return;
+      const id = entry.target.id;
+      navLinks.forEach(link=>{
+        link.classList.toggle('active', link.getAttribute('href') === '#' + id);
+      });
+    });
+  }, { rootMargin: '-45% 0px -50% 0px', threshold: 0 });
+
+  sections.forEach(s => spy.observe(s));
+})();
+
+/* ---------------- content editing: fully static, no backend ----------------
+   Edits are stored in this browser's localStorage (key EDIT_STORE_KEY below).
+   Open the page with ?edit=EDIT_KEY (see EDIT_KEY below) to unlock editing.
+   Nothing is sent anywhere — this works as a plain file, e.g. on GitHub Pages. */
+(function(){
+  const EDIT_KEY = '9451626112';
+  const STORE_KEY = 'siteContent:v1';
+
+  const editables = () => Array.from(document.querySelectorAll('[data-edit-id]'));
+  const DEFAULT_RESEARCH = [{
+    date: '5&ndash;7 Oct 2026 &middot; IISc, Bengaluru',
+    title: '&ldquo;Ultrasound-induced wetting dynamics of a molten metallic droplet&rdquo;',
+    venue: 'International Conference on Interfacial Phenomena in Droplets',
+    sup1Name: 'Prof. V S Sooraj',
+    sup1Dept: 'Dept. Aerospace Engg., IIST',
+    sup2Name: 'Prof. Sathyan Subbiah',
+    sup2Dept: 'Dept. Mech. Engg., IIT Madras',
+    abstract: 'The spreading of a liquid droplet results from the combined effect of capillary forces and viscous resistance. Under ultrasonic excitation, additional acoustic forcing can drive liquid motion and significantly alter the spreading dynamics. Here, the spreading and height evolution of a molten metallic droplet subjected to ultrasound of 20&nbsp;kHz are investigated using high-speed imaging. The observed temporal evolution is consistent with previously reported coupling between droplet thinning, acoustic pressure, and cavitation.'
+  }];
+  let researchData = DEFAULT_RESEARCH.map(p=>({...p}));
+  let editMode = false;
+  let showAllResearch = false;
+
+  function applyContent(data){
+    if(data){
+      editables().forEach(el=>{
+        const id = el.dataset.editId;
+        if(Object.prototype.hasOwnProperty.call(data, id)) el.innerHTML = data[id];
+      });
+      if(Array.isArray(data.research) && data.research.length) researchData = data.research;
+    }
+    renderResearch();
+  }
+
+  function collectContent(){
+    const data = {};
+    editables().forEach(el=> data[el.dataset.editId] = el.innerHTML.trim());
+    data.research = readResearchFromDOM();
+    return data;
+  }
+
+  function readResearchFromDOM(){
+    return Array.from(document.querySelectorAll('#research-list .research-item')).map(card=>{
+      const obj = {};
+      card.querySelectorAll('[data-field]').forEach(f=> obj[f.dataset.field] = f.innerHTML.trim());
+      return obj;
+    });
+  }
+
+  const list = document.getElementById('research-list');
+  const template = document.getElementById('research-card-template');
+  const seeAllBtn = document.getElementById('see-all-research');
+  const addBtn = document.getElementById('edit-add-research');
+
+  function renderResearch(){
+    list.innerHTML = '';
+    researchData.forEach((proj, idx)=>{
+      const node = template.content.firstElementChild.cloneNode(true);
+      node.querySelectorAll('[data-field]').forEach(f=>{
+        const key = f.dataset.field;
+        f.innerHTML = proj[key] || '';
+      });
+      const visible = editMode || showAllResearch || idx === 0;
+      node.hidden = !visible;
+      const delBtn = node.querySelector('.research-delete');
+      if(editMode){
+        node.querySelectorAll('[data-field]').forEach(f=>{
+          f.contentEditable = 'true';
+          f.style.outline = '1px dashed rgba(193,83,27,.5)';
+          f.style.outlineOffset = '3px';
+          f.style.cursor = 'text';
+          f.addEventListener('focus', ()=> f.style.outline = '1px solid #c1531b');
+          f.addEventListener('blur', ()=> f.style.outline = '1px dashed rgba(193,83,27,.5)');
+        });
+        delBtn.hidden = researchData.length <= 1;
+        delBtn.addEventListener('click', ()=>{
+          if(!confirm('Delete this research project?')) return;
+          researchData.splice(idx,1);
+          renderResearch();
+        });
+      }
+      list.appendChild(node);
+    });
+    seeAllBtn.hidden = editMode || researchData.length <= 1;
+    seeAllBtn.textContent = showAllResearch ? 'Show less ↑' : 'See all research →';
+    addBtn.hidden = !editMode;
+  }
+
+  seeAllBtn.addEventListener('click', ()=>{
+    showAllResearch = !showAllResearch;
+    renderResearch();
+  });
+  addBtn.addEventListener('click', ()=>{
+    researchData.push({
+      date: 'Date &middot; Location',
+      title: 'New project title',
+      venue: 'Venue / conference',
+      sup1Name: 'Supervisor name',
+      sup1Dept: 'Department',
+      sup2Name: 'Supervisor name',
+      sup2Dept: 'Department',
+      abstract: 'Abstract.'
+    });
+    renderResearch();
+  });
+
+  const isEditMode = () => new URLSearchParams(location.search).get('edit') === EDIT_KEY;
+
+  // Site-wide content: content.json is a plain static file next to index.html.
+  // Every visitor's browser fetches it, so whatever is committed there is what
+  // everyone sees — no server or API involved, just a regular asset on GitHub Pages.
+  //
+  // Note: fetch() cannot read local files when this page is opened as file:///...
+  // (double-clicked). It works fine once served over http/https, e.g. GitHub Pages,
+  // or a local dev server like `python3 -m http.server`. See the banner below.
+  if(location.protocol === 'file:'){
+    const warn = document.createElement('div');
+    warn.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:150;background:#c1531b;color:#f4f1ea;font-family:"Space Mono",monospace;font-size:12px;padding:10px 16px;text-align:center;';
+    warn.innerHTML = 'Viewing as a local file — content.json edits can\'t load this way (browser security blocks it). This works fine once hosted on GitHub Pages. To preview locally instead, run <code style="background:rgba(0,0,0,.2);padding:1px 5px;border-radius:4px;">python3 -m http.server</code> in this folder and open <code style="background:rgba(0,0,0,.2);padding:1px 5px;border-radius:4px;">http://localhost:8000</code>. <button id="dismiss-file-warn" style="margin-left:10px;background:transparent;border:1px solid rgba(244,241,234,.6);color:inherit;padding:2px 8px;border-radius:4px;cursor:pointer;">Dismiss</button>';
+    document.body.prepend(warn);
+    warn.querySelector('#dismiss-file-warn').addEventListener('click', ()=> warn.remove());
+  }
+
+  fetch('content.json', {cache:'no-store'})
+    .then(r=> r.ok ? r.json() : null)
+    .catch(()=> null)
+    .then(siteContent=>{
+      applyContent(siteContent);
+      // In edit mode only, layer this browser's unpublished draft on top so you can
+      // keep iterating before exporting. Regular visitors never see localStorage.
+      if(isEditMode()){
+        try {
+          const raw = localStorage.getItem(STORE_KEY);
+          if(raw) applyContent(JSON.parse(raw));
+        } catch(e) {}
+      }
+    });
+
+  let toolbar, statusEl;
+  function buildToolbar(){
+    toolbar = document.createElement('div');
+    toolbar.style.cssText = 'position:fixed;bottom:18px;right:18px;z-index:100;display:flex;gap:8px;align-items:center;font-family:"Space Mono",monospace;font-size:11px;flex-wrap:wrap;justify-content:flex-end;max-width:90vw;';
+    toolbar.innerHTML = `
+      <span id="edit-status" style="background:#0d1210;color:#f4f1ea;padding:6px 10px;border-radius:6px;opacity:.85;max-width:280px;line-height:1.4;"></span>
+      <button id="edit-save" style="background:#c1531b;color:#f4f1ea;border:none;padding:8px 14px;border-radius:6px;cursor:pointer;letter-spacing:.05em;">SAVE DRAFT</button>
+      <button id="edit-export" style="background:#1c4b45;color:#f4f1ea;border:none;padding:8px 14px;border-radius:6px;cursor:pointer;letter-spacing:.05em;">DOWNLOAD content.json</button>
+      <button id="edit-exit" style="background:#0d1210;color:#f4f1ea;border:none;padding:8px 14px;border-radius:6px;cursor:pointer;letter-spacing:.05em;">EXIT EDIT</button>
+    `;
+    document.body.appendChild(toolbar);
+    statusEl = toolbar.querySelector('#edit-status');
+    statusEl.textContent = 'Edit text, then Save Draft to preview. To publish for everyone, Download content.json and commit it next to index.html.';
+
+    toolbar.querySelector('#edit-save').addEventListener('click', ()=>{
+      const data = collectContent();
+      try {
+        localStorage.setItem(STORE_KEY, JSON.stringify(data));
+        statusEl.textContent = 'Draft saved (visible only to you, in this browser) ✓ — download content.json to publish it.';
+      } catch(e) {
+        statusEl.textContent = 'Could not save draft (storage full/blocked)';
+      }
+    });
+
+    toolbar.querySelector('#edit-export').addEventListener('click', ()=>{
+      const data = collectContent();
+      const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'content.json';
+      a.click();
+      URL.revokeObjectURL(a.href);
+      statusEl.textContent = 'Downloaded. Put this file next to index.html in your repo and push — that’s what makes it live for everyone.';
+    });
+
+    toolbar.querySelector('#edit-exit').addEventListener('click', ()=>{
+      const url = new URL(location.href);
+      url.searchParams.delete('edit');
+      location.href = url.toString();
+    });
+  }
+
+  function enableEditMode(){
+    editMode = true;
+    editables().forEach(el=>{
+      el.contentEditable = 'true';
+      el.style.outline = '1px dashed rgba(193,83,27,.5)';
+      el.style.outlineOffset = '3px';
+      el.style.cursor = 'text';
+      el.addEventListener('focus', ()=> el.style.outline = '1px solid #c1531b');
+      el.addEventListener('blur', ()=> el.style.outline = '1px dashed rgba(193,83,27,.5)');
+    });
+    renderResearch();
+    buildToolbar();
+  }
+
+  window.addEventListener('DOMContentLoaded', ()=>{
+    if(isEditMode()) enableEditMode();
+  });
+})();
+</script>
+
+</body>
+</html>

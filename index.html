@@ -862,10 +862,6 @@ window.addEventListener('scroll', () => {
     authors.forEach(author => {
         const line = document.createElement('p');
         line.textContent = author;
-
-        if (author === "Ekashman Tiwari") {
-          line.style.fontWeight = "bold";
-        }
         line.className = 'mb-1';
         container.appendChild(line);
     });

@@ -47,7 +47,14 @@
       "date": "14–16 Oct 2026 · IIT Ropar, India",
       "title": "“Learning bubble dynamics in viscoelastic fluids: A data-assisted PINN”",
       "venue": "International Conference on Complex Fluids (CompFlu) 2026",
+      "authors": [
+        "Aritra Roy",
+        "Ayan Mukherjee",
+        "Ekashman Tiwari",
+        "Mandeep Saini"
+      ],
       "abstract": "Keywords: Scientific Machine Learning, Viscoelasticity, Stiff Dynamical Systems, Rayleigh-Plesset equation, PINNs."
     }
   ]
 }
+

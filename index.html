@@ -32,13 +32,116 @@ tailwind.config = {
 </script>
 
 <style>
+/* Full-cover media collage */
+#cover-collage {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  pointer-events: none;
+  background: #0d1210;
+}
+
+/* Invisible 2 x 2 grid */
+.collage-grid {
+  height: 62%;
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+  gap: 0;
+}
+
+.collage-cell {
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.collage-cell img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  opacity: 0.48;
+  mix-blend-mode: screen;
+  filter: grayscale(15%) contrast(1.05);
+}
+
+/* Video spans the width below the four images */
+.collage-video {
+  height: 38%;
+  width: 100%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.collage-video video {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  opacity: 0.42;
+  mix-blend-mode: screen;
+}
+
+/* Gentle fade at the bottom and edges */
+.collage-overlay {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(to bottom,
+      rgba(13,18,16,0.05) 0%,
+      rgba(13,18,16,0.08) 55%,
+      rgba(13,18,16,0.72) 100%),
+    linear-gradient(to right,
+      rgba(13,18,16,0.18),
+      transparent 18%,
+      transparent 82%,
+      rgba(13,18,16,0.18));
+  z-index: 2;
+}
+
+/* Keep the existing heading and text above the collage */
+#top > header > .relative.z-10 {
+  position: relative;
+  z-index: 10;
+}
+
+@media (max-width: 767px) {
+  .collage-grid {
+    height: 58%;
+  }
+
+  .collage-video {
+    height: 42%;
+  }
+
+  .collage-cell img {
+    opacity: 0.36;
+  }
+
+  .collage-video video {
+    opacity: 0.32;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .collage-video video {
+    /* Video remains muted and looping; browser controls playback. */
+  }
+}
+  
 html { scroll-behavior: smooth; }
 body { background: #f4f1ea; cursor: default; }
 
-#flow {
-  position: absolute; inset: 0; width: 100%; height: 100%;
-  z-index: 0; opacity: .9;
-}
 
 .grain {
   position: fixed; inset: 0; z-index: 40; pointer-events: none;
@@ -268,59 +371,105 @@ nav.scrolled .nav-tabs .draw-link.active { mix-blend-mode: normal; }
 
 <main id="top" class="relative">
 
-  <header class="relative min-h-screen flex items-end overflow-hidden bg-ink text-paper">
-    <canvas id="stars" class="absolute inset-0 w-full h-full z-0"></canvas>
-    <canvas id="flow" class="absolute inset-0 w-full h-full z-0"></canvas>
+<header class="relative min-h-screen flex items-end overflow-hidden bg-ink text-paper">
 
-    <div id="traj-wrap" class="absolute inset-0 pointer-events-none z-[1]">
-      <svg id="traj-svg" class="w-full h-full block">
-        <path id="trajPath" fill="none" stroke="#c1531b" stroke-opacity=".35"
-          stroke-width="1.5" stroke-dasharray="2 9" stroke-linecap="round"
-          vector-effect="non-scaling-stroke"></path>
-      </svg>
-      <div id="rocket1" class="absolute top-0 left-0">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
-          stroke="#c1531b" stroke-width="1.6">
-          <path d="M12 2c3 2.5 4 6 4 10 0 3-1 6-4 9-3-3-4-6-4-9 0-4 1-7.5 4-10z"/>
-          <circle cx="12" cy="9" r="1.5" fill="#c1531b" stroke="none"/>
-          <path d="M8 15l-3 4 4-1.5M16 15l3 4-4-1.5"/>
-        </svg>
+  <!-- Background collage: four images and one looping video -->
+  <div id="cover-collage" aria-hidden="true">
+
+    <!-- Four-image grid -->
+    <div class="collage-grid">
+      <div class="collage-cell">
+        <img src="image1.png" alt="">
+      </div>
+      <div class="collage-cell">
+        <img src="image2.png" alt="">
+      </div>
+      <div class="collage-cell">
+        <img src="image3.png" alt="">
+      </div>
+      <div class="collage-cell">
+        <img src="image4.png" alt="">
       </div>
     </div>
 
-    <div class="relative z-10 max-w-6xl mx-auto px-6 md:px-10 pb-16 pt-32 w-full">
-      <div class="grid grid-cols-1 md:grid-cols-12 gap-10 items-end">
-        <div class="md:col-span-8">
-          <p class="font-mono text-xs tracking-[0.25em] uppercase text-rust mb-6">
-            Aerospace Engineering &mdash; B.Tech, IIST
-          </p>
-          <h1 class="font-serif font-medium tracking-tight text-paper" id="hero-title"
-            style="font-size:clamp(1.3rem,7vw,6.2rem);line-height:1.02;">
-            <span class="block whitespace-nowrap">
-              <span class="inline-block overflow-hidden pb-[0.06em]"><span class="word">Where</span></span>
-              <span class="inline-block overflow-hidden pb-[0.06em]"><span class="word">liquids</span></span>
-              <span class="inline-block overflow-hidden pb-[0.06em]"><span class="word">forget</span></span>
-            </span>
-            <span class="block whitespace-nowrap">
-              <span class="inline-block overflow-hidden pb-[0.06em]"><span class="word">which</span></span>
-              <span class="inline-block overflow-hidden pb-[0.06em]"><span class="word">way</span></span>
-              <span class="inline-block overflow-hidden pb-[0.06em]"><span class="word">is</span></span>
-              <span class="inline-block overflow-hidden pb-[0.06em]"><span class="word italic text-rust" id="down-word">down.</span></span>
-            </span>
-          </h1>
-        </div>
-
-        <div class="md:col-span-4 fade-up">
-          <p class="text-[15px] leading-relaxed max-w-xs md:ml-auto text-paper/90" data-edit-id="hero-subtext">
-            I study how fluids, plasmas and fields behave in microgravity &mdash; and build the small spacecraft that carry those questions into orbit.
-          </p>
-          <a href="#highlight" class="draw-link inline-block mt-6 font-mono text-xs tracking-widest uppercase text-paper" data-edit-id="hero-cta">
-            Latest work &rarr;
-          </a>
-        </div>
-      </div>
+    <!-- Autoplaying, muted, looping video -->
+    <div class="collage-video">
+      <video autoplay muted loop playsinline preload="auto">
+        <source src="video.mp4" type="video/mp4">
+      </video>
     </div>
-  </header>
+
+    <!-- Dark overlay for readable cover text -->
+    <div class="collage-overlay"></div>
+  </div>
+
+  <!-- Rocket cursor: retained from the original design -->
+  <div id="rocket1" class="absolute top-0 left-0 z-20 pointer-events-none">
+    <svg
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="#c1531b"
+      stroke-width="1.6"
+      aria-hidden="true"
+    >
+      <path d="M12 2c3 2.5 4 6 4 10 0 3-1 6-4 9-3-3-4-6-4-9 0-4 1-7.5 4-10z"/>
+      <circle cx="12" cy="9" r="1.5" fill="#c1531b" stroke="none"/>
+      <path d="M8 15l-3 4 4-1.5M16 15l3 4-4-1.5"/>
+    </svg>
+  </div>
+
+  <!-- Original cover text -->
+  <div class="relative z-10 max-w-6xl mx-auto px-6 md:px-10 pb-16 pt-32 w-full">
+    <div class="grid grid-cols-1 md:grid-cols-12 gap-10 items-end">
+
+      <div class="md:col-span-8">
+        <p class="font-mono text-xs tracking-[0.25em] uppercase text-rust mb-6">
+          Aerospace Engineering &mdash; B.Tech, IIST
+        </p>
+
+        <h1
+          class="font-serif font-medium tracking-tight text-paper"
+          id="hero-title"
+          style="font-size:clamp(1.3rem,7vw,6.2rem);line-height:1.02;"
+        >
+          <span class="block whitespace-nowrap">
+            <span class="inline-block overflow-hidden pb-[0.06em]"><span class="word">Where</span></span>
+            <span class="inline-block overflow-hidden pb-[0.06em]"><span class="word">liquids</span></span>
+            <span class="inline-block overflow-hidden pb-[0.06em]"><span class="word">forget</span></span>
+          </span>
+
+          <span class="block whitespace-nowrap">
+            <span class="inline-block overflow-hidden pb-[0.06em]"><span class="word">which</span></span>
+            <span class="inline-block overflow-hidden pb-[0.06em]"><span class="word">way</span></span>
+            <span class="inline-block overflow-hidden pb-[0.06em]"><span class="word">is</span></span>
+            <span class="inline-block overflow-hidden pb-[0.06em]"><span class="word italic text-rust" id="down-word">down.</span></span>
+          </span>
+        </h1>
+      </div>
+
+      <div class="md:col-span-4 fade-up">
+        <p
+          class="text-[15px] leading-relaxed max-w-xs md:ml-auto text-paper/90"
+          data-edit-id="hero-subtext"
+        >
+          I study how fluids, plasmas and fields behave in microgravity &mdash; and build the small spacecraft that carry those questions into orbit.
+        </p>
+
+        <a
+          href="#highlight"
+          class="draw-link inline-block mt-6 font-mono text-xs tracking-widest uppercase text-paper"
+          data-edit-id="hero-cta"
+        >
+          Latest work &rarr;
+        </a>
+      </div>
+
+    </div>
+  </div>
+
+</header>
 
   <div class="border-b border-ink/25 py-4 overflow-hidden">
     <div class="marquee-track font-mono text-xs tracking-widest uppercase text-ink/90 whitespace-nowrap">
@@ -537,192 +686,74 @@ nav.scrolled .nav-tabs .draw-link.active { mix-blend-mode: normal; }
 </main>
 
 <script>
-/* Hero rocket */
+/* Rocket cursor: follows the pointer and drifts when idle */
 (function () {
-  const wrap = document.getElementById('traj-wrap');
-  const svg = document.getElementById('traj-svg');
-  const path = document.getElementById('trajPath');
+  const hero = document.querySelector('#top > header');
   const rocket = document.getElementById('rocket1');
-  const hero = wrap.closest('header');
 
-  let w = 0, h = 0;
-  function resize() {
-    w = hero.offsetWidth;
-    h = hero.offsetHeight;
-    svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
-  }
-  window.addEventListener('resize', resize);
-  resize();
+  if (!hero || !rocket) return;
 
-  const orbit = { cx: 0, cy: 0, rx: 0, ry: 0, t: 0 };
-  function setOrbit() {
-    orbit.cx = w * .8;
-    orbit.cy = h * .3;
-    orbit.rx = Math.max(w * .09, 60);
-    orbit.ry = Math.max(h * .1, 60);
-  }
-  setOrbit();
-  window.addEventListener('resize', setOrbit);
-
-  let userMoved = false, idle = true, lastMoveTime = 0;
-  const IDLE_DELAY = 900;
-  let target = { x: orbit.cx + orbit.rx, y: orbit.cy };
-  let pos = { x: target.x, y: target.y };
+  let targetX = hero.clientWidth * 0.8;
+  let targetY = hero.clientHeight * 0.3;
+  let posX = targetX;
+  let posY = targetY;
   let angle = -90;
-  const trail = [];
-  const TRAIL_LEN = 9;
-  const hoverCenter = { x: target.x, y: target.y };
-  const hover = { rx: 26, ry: 18, t: Math.random() * 10 };
+  let lastMoveTime = performance.now();
+  let idle = true;
 
-  hero.addEventListener('pointermove', e => {
-    userMoved = true;
-    idle = false;
+  const IDLE_DELAY = 900;
+  const hover = { x: targetX, y: targetY, t: 0 };
+  const hoverRX = 26;
+  const hoverRY = 18;
+
+  hero.addEventListener('pointermove', (e) => {
+    const rect = hero.getBoundingClientRect();
+
+    targetX = e.clientX - rect.left;
+    targetY = e.clientY - rect.top;
+
     lastMoveTime = performance.now();
-    const r = hero.getBoundingClientRect();
-    target.x = e.clientX - r.left;
-    target.y = e.clientY - r.top;
+    idle = false;
   });
 
   function tick() {
-    if (!userMoved) {
-      orbit.t += .006;
-      target.x = orbit.cx + Math.cos(orbit.t) * orbit.rx;
-      target.y = orbit.cy + Math.sin(orbit.t) * orbit.ry;
-    } else if (performance.now() - lastMoveTime > IDLE_DELAY) {
+    const now = performance.now();
+
+    if (now - lastMoveTime > IDLE_DELAY) {
       if (!idle) {
         idle = true;
-        hoverCenter.x = target.x;
-        hoverCenter.y = target.y;
+        hover.x = targetX;
+        hover.y = targetY;
         hover.t = 0;
       }
-      hover.t += .035;
-      target.x = hoverCenter.x + Math.cos(hover.t) * hover.rx;
-      target.y = hoverCenter.y + Math.sin(hover.t * 1.7) * hover.ry;
+
+      hover.t += 0.035;
+      targetX = hover.x + Math.cos(hover.t) * hoverRX;
+      targetY = hover.y + Math.sin(hover.t * 1.7) * hoverRY;
     }
 
-    const dx = target.x - pos.x, dy = target.y - pos.y;
-    pos.x += dx * .08;
-    pos.y += dy * .08;
+    const dx = targetX - posX;
+    const dy = targetY - posY;
 
-    if (Math.abs(dx) > .4 || Math.abs(dy) > .4) {
+    posX += dx * 0.08;
+    posY += dy * 0.08;
+
+    if (Math.abs(dx) > 0.4 || Math.abs(dy) > 0.4) {
       angle = Math.atan2(dy, dx) * 180 / Math.PI;
     }
 
-    trail.push({ x: pos.x, y: pos.y });
-    if (trail.length > TRAIL_LEN) trail.shift();
-
-    if (trail.length > 1) {
-      let d = `M ${trail[0].x} ${trail[0].y}`;
-      for (let i = 1; i < trail.length; i++) d += ` L ${trail[i].x} ${trail[i].y}`;
-      path.setAttribute('d', d);
-    }
-
     rocket.style.transform =
-      `translate(${pos.x}px,${pos.y}px) rotate(${angle + 90}deg) translate(-12px,-12px)`;
+      `translate(${posX}px, ${posY}px) rotate(${angle + 90}deg) translate(-12px, -12px)`;
 
     requestAnimationFrame(tick);
   }
+
+  window.addEventListener('resize', () => {
+    targetX = Math.min(targetX, hero.clientWidth);
+    targetY = Math.min(targetY, hero.clientHeight);
+  });
+
   tick();
-})();
-
-/* Starfield */
-(function () {
-  const canvas = document.getElementById('stars');
-  const ctx = canvas.getContext('2d');
-  let w, h, dpr, stars = [];
-
-  function resize() {
-    dpr = Math.min(window.devicePixelRatio || 1, 2);
-    w = canvas.clientWidth = canvas.parentElement.offsetWidth;
-    h = canvas.clientHeight = canvas.parentElement.offsetHeight;
-    canvas.width = w * dpr;
-    canvas.height = h * dpr;
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    stars = Array.from({ length: Math.round(w * h / 9000) }, () => ({
-      x: Math.random() * w,
-      y: Math.random() * h,
-      r: Math.random() * 1.2 + .3,
-      tw: Math.random() * Math.PI * 2,
-      sp: .01 + Math.random() * .02
-    }));
-  }
-  window.addEventListener('resize', resize);
-  resize();
-
-  function draw() {
-    ctx.clearRect(0, 0, w, h);
-    stars.forEach(s => {
-      s.tw += s.sp;
-      const a = .4 + Math.sin(s.tw) * .35;
-      ctx.beginPath();
-      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(244,241,234,${Math.max(a,.15)})`;
-      ctx.fill();
-    });
-    requestAnimationFrame(draw);
-  }
-  draw();
-})();
-
-/* Flow-field canvas */
-(function () {
-  const canvas = document.getElementById('flow');
-  const ctx = canvas.getContext('2d');
-  let w, h, dpr;
-
-  function resize() {
-    dpr = Math.min(window.devicePixelRatio || 1, 2);
-    w = canvas.clientWidth = canvas.parentElement.offsetWidth;
-    h = canvas.clientHeight = canvas.parentElement.offsetHeight;
-    canvas.width = w * dpr;
-    canvas.height = h * dpr;
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  }
-  window.addEventListener('resize', resize);
-  resize();
-
-  const COLS = 34;
-  const lines = [];
-  for (let i = 0; i < COLS; i++) {
-    lines.push({
-      xf: i / (COLS - 1),
-      phase: Math.random() * 1000,
-      phase2: Math.random() * 1000,
-      sp: .25 + Math.random() * .35,
-      width: .8 + Math.random() * 1.6,
-      alpha: .16 + Math.random() * .22,
-      tint: Math.random()
-    });
-  }
-
-  let t = 0;
-  function draw() {
-    t++;
-    ctx.clearRect(0, 0, w, h);
-    ctx.lineCap = 'round';
-
-    lines.forEach((ln, idx) => {
-      const baseX = ln.xf * w;
-      ctx.beginPath();
-
-      for (let y = 0; y <= h; y += 8) {
-        const wobble =
-          Math.sin(y * .012 + t * .012 * ln.sp * 3 + ln.phase) * (30 + idx % 5 * 4) +
-          Math.sin(y * .028 + t * .006 + ln.phase2) * 14;
-        const x = baseX + wobble;
-        if (y === 0) ctx.moveTo(x, y);
-        else ctx.lineTo(x, y);
-      }
-
-      const c = ln.tint < .5 ? '193,83,27' : '244,241,234';
-      ctx.strokeStyle = `rgba(${c},${ln.alpha})`;
-      ctx.lineWidth = ln.width;
-      ctx.stroke();
-    });
-
-    requestAnimationFrame(draw);
-  }
-  draw();
 })();
 
 /* Hero title reveal */

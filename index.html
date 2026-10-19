@@ -352,7 +352,7 @@ nav.scrolled .nav-tabs .draw-link.active { mix-blend-mode: normal; }
       </div>
 
       <div class="md:col-span-3 photo-frame fade-up">
-        <img src="ekashman_portrait.png" alt="Portrait" class="w-full aspect-[4/5] object-cover grayscale-[15%] contrast-[1.05]">
+        <img src="ishqman.png" alt="Portrait" class="w-full aspect-[4/5] object-cover grayscale-[15%] contrast-[1.05]">
       </div>
     </div>
   </section>
@@ -853,19 +853,7 @@ window.addEventListener('scroll', () => {
   }
 
   function renderAuthors(container, authors) {
-    if (!container) return;
-
     container.replaceChildren();
-
-    if (!Array.isArray(authors)) return;
-
-    authors.forEach(author => {
-        const line = document.createElement('p');
-        line.textContent = author;
-        line.className = 'mb-1';
-        container.appendChild(line);
-    });
-}
 
     normaliseAuthors(authors).forEach(name => {
       const span = document.createElement('span');

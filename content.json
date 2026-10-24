@@ -5,6 +5,7 @@
   "about-lead": "I'm an Aerospace Engineering undergraduate at the Indian Institute of Space Science and Technology, Thiruvananthapuram — currently in my third year.",
   "about-body": "My research interests sit at the intersection of interfacial fluid dynamics in microgravity conditions, magnetohydrodynamics for space applications, and computational plasma physics. Alongside this, I work on the development of CubeSats under the Small Spacecraft Systems and Payload Centre (SSPACE), IIST, where I'm involved in the thermal subsystem.",
   "highlight-heading": "Presenting",
+  "collaborators-heading": "Collaborators and Ongoing Work",
   "education-heading": "Education",
   "edu1-years": "2024–28",
   "edu1-school": "Indian Institute of Space Science and Technology",
@@ -55,6 +56,21 @@
       ],
       "abstract": "Keywords: Scientific Machine Learning, Viscoelasticity, Stiff Dynamical Systems, Rayleigh-Plesset equation, PINNs."
     }
+  ],
+  "collaborators": [
+    {
+      "name": "Dr. Rahil Valani",
+      "affiliation": "Rudolf Peierls Centre for Theoretical Physics, University of Oxford",
+      "work": "Active particle dynamics in MHD flows.",
+      "status": "Ongoing",
+      "url": ""
+    },
+    {
+      "name": "Aritra Roy",
+      "affiliation": "IIT Bombay",
+      "work": "Bubble dynamics in viscoelastic fluids.",
+      "status": "Ongoing",
+      "url": ""
+    }
   ]
 }
-

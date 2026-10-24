@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -32,117 +31,35 @@ tailwind.config = {
 </script>
 
 <style>
-/* Full-cover media collage */
-#cover-collage {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-  pointer-events: none;
-  background: #f4f1ea;
+/* Hero media */
+.hero-media {
+  display: grid; grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 12px; padding-top: 5.5rem;
 }
-
-/* Invisible 2 x 2 grid */
-.collage-grid {
-  height: 62%;
-  width: 100%;
-  display: grid;
+.hero-images {
+  grid-column: 1 / -1; display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  grid-template-rows: repeat(2, minmax(0, 1fr));
-  gap: 0;
+  grid-template-rows: repeat(2, minmax(0, 1fr)); gap: 12px;
+}
+.hero-cell {
+  background: #f4f1ea; border-radius: 6px; overflow: hidden;
+  padding: 6px; aspect-ratio: 4 / 3;
+  box-shadow: 0 10px 30px -12px rgba(0,0,0,.6);
+}
+.hero-cell img { width: 100%; height: 100%; object-fit: contain; display: block; }
+.hero-video {
+  grid-column: 1 / -1; background: #000; border-radius: 6px;
+  overflow: hidden; aspect-ratio: 16 / 9;
+  box-shadow: 0 10px 30px -12px rgba(0,0,0,.6);
+}
+.hero-video video { width: 100%; height: 100%; object-fit: contain; display: block; }
+@media (min-width: 768px) {
+  .hero-media { height: 72vh; min-height: 520px; }
+  .hero-images { grid-column: span 7; }
+  .hero-cell { aspect-ratio: auto; }
+  .hero-video { grid-column: span 5; aspect-ratio: auto; height: 100%; }
 }
 
-.collage-cell img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-
-  opacity: 0.70;
-  mix-blend-mode: multiply;
-  filter: grayscale(25%) brightness(0.65) contrast(1.10);
-}
-
-.collage-cell img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  opacity: 0.48;
-  mix-blend-mode: screen;
-  filter: grayscale(15%) contrast(1.05);
-}
-
-/* Video spans the width below the four images */
-.collage-video {
-  height: 38%;
-  width: 100%;
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.collage-video video {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-
-  opacity: 0.60;
-  mix-blend-mode: multiply;
-  filter: grayscale(25%) brightness(0.65) contrast(1.10);
-}
-
-/* Gentle fade at the bottom and edges */
-.collage-overlay {
-  position: absolute;
-  inset: 0;
-  background:
-    linear-gradient(to bottom,
-      rgba(13,18,16,0.05) 0%,
-      rgba(13,18,16,0.08) 55%,
-      rgba(13,18,16,0.72) 100%),
-    linear-gradient(to right,
-      rgba(13,18,16,0.18),
-      transparent 18%,
-      transparent 82%,
-      rgba(13,18,16,0.18));
-  z-index: 2;
-}
-
-/* Keep the existing heading and text above the collage */
-#top > header > .relative.z-10 {
-  position: relative;
-  z-index: 10;
-}
-
-@media (max-width: 767px) {
-  .collage-grid {
-    height: 58%;
-  }
-
-  .collage-video {
-    height: 42%;
-  }
-
-  .collage-cell img {
-    opacity: 0.36;
-  }
-
-  .collage-video video {
-    opacity: 0.32;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .collage-video video {
-    /* Video remains muted and looping; browser controls playback. */
-  }
-}
-  
 html { scroll-behavior: smooth; }
 body { background: #f4f1ea; cursor: default; }
 
@@ -273,7 +190,7 @@ nav.scrolled .nav-tabs .draw-link.active { mix-blend-mode: normal; }
   transition: transform .4s cubic-bezier(.65,0,.35,1);
 }
 .menu-link:hover::after { transform: scaleX(1); transform-origin: left; }
-.nav-invert { color: #f4f1ea; mix-blend-mode: difference; }
+.nav-invert { color: #f4f1ea; transition: color .4s ease; }
 
 @media (max-width: 767px) {
   .marquee-track { animation-duration: 18s; }
@@ -320,12 +237,6 @@ nav.scrolled .nav-tabs .draw-link.active { mix-blend-mode: normal; }
 }
 
 [hidden] { display: none !important; }
-
-#nav:not(.scrolled) .nav-invert {
-  color: #0d1210;
-  mix-blend-mode: normal;
-}
-  
 </style>
 </head>
 
@@ -343,6 +254,7 @@ nav.scrolled .nav-tabs .draw-link.active { mix-blend-mode: normal; }
     <ul class="nav-tabs nav-extra hidden md:flex items-center gap-x-14 font-mono text-[11px] tracking-[0.18em] uppercase">
       <li><a href="#about" class="nav-invert draw-link">About</a></li>
       <li><a href="#highlight" class="nav-invert draw-link">Research</a></li>
+      <li><a href="#collaborators" class="nav-invert draw-link">Ongoing</a></li>
       <li><a href="#education" class="nav-invert draw-link">Education</a></li>
       <li><a href="#experience" class="nav-invert draw-link">Experience</a></li>
       <li><a href="#positions" class="nav-invert draw-link">Roles</a></li>
@@ -370,6 +282,7 @@ nav.scrolled .nav-tabs .draw-link.active { mix-blend-mode: normal; }
     <ul class="flex flex-col gap-6 font-serif text-3xl">
       <li><a href="#about" class="menu-link">About</a></li>
       <li><a href="#highlight" class="menu-link">Research</a></li>
+      <li><a href="#collaborators" class="menu-link">Ongoing</a></li>
       <li><a href="#education" class="menu-link">Education</a></li>
       <li><a href="#experience" class="menu-link">Experience</a></li>
       <li><a href="#positions" class="menu-link">Roles</a></li>
@@ -381,87 +294,40 @@ nav.scrolled .nav-tabs .draw-link.active { mix-blend-mode: normal; }
 
 <main id="top" class="relative">
 
-<header class="relative min-h-screen flex items-end overflow-hidden bg-paper text-ink">
+<header class="relative bg-ink text-paper">
+  <div class="max-w-6xl mx-auto px-6 md:px-10">
 
-  <!-- Background collage: four images and one looping video -->
-  <div id="cover-collage" aria-hidden="true">
-
-    <!-- Four-image grid -->
-    <div class="collage-grid">
-      <div class="collage-cell">
-        <img src="image2.png" alt="">
+    <div class="hero-media">
+      <div class="hero-images">
+        <div class="hero-cell"><img src="image2.png" alt="Research figure"></div>
+        <div class="hero-cell"><img src="image3.png" alt="Research figure"></div>
+        <div class="hero-cell"><img src="image1.png" alt="Research figure"></div>
+        <div class="hero-cell"><img src="image4.png" alt="Research figure"></div>
       </div>
-      <div class="collage-cell">
-        <img src="image3.png" alt="">
-      </div>
-      <div class="collage-cell">
-        <img src="image1.png" alt="">
-      </div>
-      <div class="collage-cell">
-        <img src="image4.png" alt="">
+      <div class="hero-video">
+        <video autoplay muted loop playsinline preload="auto">
+          <source src="video.mp4" type="video/mp4">
+        </video>
       </div>
     </div>
 
-    <!-- Autoplaying, muted, looping video -->
-    <div class="collage-video">
-      <video autoplay muted loop playsinline preload="auto">
-        <source src="video.mp4" type="video/mp4">
-      </video>
-    </div>
-
-    <!-- Dark overlay for readable cover text -->
-    <div class="collage-overlay"></div>
-  </div>
-
-  <!-- Rocket cursor: retained from the original design -->
-  <div id="rocket1" class="absolute top-0 left-0 z-20 pointer-events-none">
-    <svg
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="#c1531b"
-      stroke-width="1.6"
-      aria-hidden="true"
-    >
-      <path d="M12 2c3 2.5 4 6 4 10 0 3-1 6-4 9-3-3-4-6-4-9 0-4 1-7.5 4-10z"/>
-      <circle cx="12" cy="9" r="1.5" fill="#c1531b" stroke="none"/>
-      <path d="M8 15l-3 4 4-1.5M16 15l3 4-4-1.5"/>
-    </svg>
-  </div>
-
-  <!-- Original cover text -->
-  <div class="relative z-10 max-w-6xl mx-auto px-6 md:px-10 pb-16 pt-32 w-full">
-    <div class="grid grid-cols-1 md:grid-cols-12 gap-10 items-end">
-
+    <div class="grid grid-cols-1 md:grid-cols-12 gap-10 items-end pt-12 pb-16">
       <div class="md:col-span-8">
-        <p class="font-mono text-xs tracking-[0.25em] uppercase text-rust mb-6">
+        <p class="font-mono text-xs tracking-[0.25em] uppercase text-[#e8793f]">
           Aerospace Engineering &mdash; B.Tech, IIST
         </p>
-
-      
       </div>
-
       <div class="md:col-span-4 fade-up">
-        <p
-          class="text-[15px] leading-relaxed max-w-xs md:ml-auto text-ink/90"
-          data-edit-id="hero-subtext"
-        >
+        <p class="text-[15px] leading-relaxed max-w-xs md:ml-auto text-paper/90" data-edit-id="hero-subtext">
           I study how fluids, plasmas and fields behave in microgravity &mdash; and build the small spacecraft that carry the science into orbit.
         </p>
-
-        <a
-          href="#highlight"
-          class="draw-link inline-block mt-6 font-mono text-xs tracking-widest uppercase text-ink"
-          data-edit-id="hero-cta"
-        >
+        <a href="#highlight" class="draw-link inline-block mt-6 font-mono text-xs tracking-widest uppercase text-paper" data-edit-id="hero-cta">
           Latest work &rarr;
         </a>
       </div>
-
     </div>
-  </div>
 
+  </div>
 </header>
 
   <div class="border-b border-ink/25 py-4 overflow-hidden">
@@ -540,10 +406,39 @@ nav.scrolled .nav-tabs .draw-link.active { mix-blend-mode: normal; }
     </article>
   </template>
 
-  <section id="education" class="max-w-6xl mx-auto px-6 md:px-10 py-24 md:py-32 border-b border-ink/25">
+  <section id="collaborators" class="max-w-6xl mx-auto px-6 md:px-10 py-24 md:py-32 border-b border-ink/25">
     <div class="grid grid-cols-1 md:grid-cols-12 gap-12">
       <div class="md:col-span-3 fade-up">
         <span class="font-mono text-xs text-ink/70 num-mark">03</span>
+        <h2 class="font-serif text-3xl mt-2" data-edit-id="collaborators-heading">Collaborators and Ongoing Work</h2>
+        <button id="edit-add-collab" hidden
+          class="mt-6 font-mono text-[11px] tracking-widest uppercase border border-rust text-rust px-3 py-2 rounded-md hover:bg-rust hover:text-paper transition-colors">
+          + Add entry
+        </button>
+      </div>
+      <div class="md:col-span-9">
+        <div id="collab-list" class="border-b border-ink/25"></div>
+      </div>
+    </div>
+  </section>
+
+  <template id="collab-template">
+    <div class="card collab-item grid grid-cols-1 sm:grid-cols-[1fr_auto] gap-x-6 gap-y-2 py-7 items-baseline">
+      <div>
+        <p class="font-serif text-xl" data-field="name"></p>
+        <p class="text-sm text-ink/90 mt-1" data-field="affiliation"></p>
+        <p class="text-[15px] leading-relaxed text-ink/90 mt-3" data-field="work"></p>
+        <p class="font-mono text-xs mt-3" data-field="url"></p>
+        <button class="collab-delete mt-4 font-mono text-[11px] tracking-widest uppercase text-rust/80 hover:text-rust" hidden>Delete this entry</button>
+      </div>
+      <span class="font-mono text-xs text-rust whitespace-nowrap" data-field="status"></span>
+    </div>
+  </template>
+
+  <section id="education" class="max-w-6xl mx-auto px-6 md:px-10 py-24 md:py-32 border-b border-ink/25">
+    <div class="grid grid-cols-1 md:grid-cols-12 gap-12">
+      <div class="md:col-span-3 fade-up">
+        <span class="font-mono text-xs text-ink/70 num-mark">04</span>
         <h2 class="font-serif text-3xl mt-2" data-edit-id="education-heading">Education</h2>
       </div>
 
@@ -581,7 +476,7 @@ nav.scrolled .nav-tabs .draw-link.active { mix-blend-mode: normal; }
   <section id="experience" class="max-w-6xl mx-auto px-6 md:px-10 py-24 md:py-32 border-b border-ink/25">
     <div class="grid grid-cols-1 md:grid-cols-12 gap-12">
       <div class="md:col-span-3 fade-up">
-        <span class="font-mono text-xs text-ink/70 num-mark">04</span>
+        <span class="font-mono text-xs text-ink/70 num-mark">05</span>
         <h2 class="font-serif text-3xl mt-2" data-edit-id="experience-heading">Experience</h2>
       </div>
 
@@ -608,7 +503,7 @@ nav.scrolled .nav-tabs .draw-link.active { mix-blend-mode: normal; }
   <section id="positions" class="max-w-6xl mx-auto px-6 md:px-10 py-24 md:py-32 border-b border-ink/25">
     <div class="grid grid-cols-1 md:grid-cols-12 gap-12">
       <div class="md:col-span-3 fade-up">
-        <span class="font-mono text-xs text-ink/70 num-mark">05</span>
+        <span class="font-mono text-xs text-ink/70 num-mark">06</span>
         <h2 class="font-serif text-3xl mt-2" data-edit-id="positions-heading">Roles</h2>
       </div>
 
@@ -643,7 +538,7 @@ nav.scrolled .nav-tabs .draw-link.active { mix-blend-mode: normal; }
   <section id="contact" class="max-w-6xl mx-auto px-6 md:px-10 py-24 md:py-32 border-b border-ink/25">
     <div class="grid grid-cols-1 md:grid-cols-12 gap-12">
       <div class="md:col-span-3 fade-up">
-        <span class="font-mono text-xs text-ink/70 num-mark">06</span>
+        <span class="font-mono text-xs text-ink/70 num-mark">07</span>
         <h2 class="font-serif text-3xl mt-2" data-edit-id="contact-heading">Contact</h2>
       </div>
 
@@ -679,76 +574,6 @@ nav.scrolled .nav-tabs .draw-link.active { mix-blend-mode: normal; }
 </main>
 
 <script>
-/* Rocket cursor: follows the pointer and drifts when idle */
-(function () {
-  const hero = document.querySelector('#top > header');
-  const rocket = document.getElementById('rocket1');
-
-  if (!hero || !rocket) return;
-
-  let targetX = hero.clientWidth * 0.8;
-  let targetY = hero.clientHeight * 0.3;
-  let posX = targetX;
-  let posY = targetY;
-  let angle = -90;
-  let lastMoveTime = performance.now();
-  let idle = true;
-
-  const IDLE_DELAY = 900;
-  const hover = { x: targetX, y: targetY, t: 0 };
-  const hoverRX = 26;
-  const hoverRY = 18;
-
-  hero.addEventListener('pointermove', (e) => {
-    const rect = hero.getBoundingClientRect();
-
-    targetX = e.clientX - rect.left;
-    targetY = e.clientY - rect.top;
-
-    lastMoveTime = performance.now();
-    idle = false;
-  });
-
-  function tick() {
-    const now = performance.now();
-
-    if (now - lastMoveTime > IDLE_DELAY) {
-      if (!idle) {
-        idle = true;
-        hover.x = targetX;
-        hover.y = targetY;
-        hover.t = 0;
-      }
-
-      hover.t += 0.035;
-      targetX = hover.x + Math.cos(hover.t) * hoverRX;
-      targetY = hover.y + Math.sin(hover.t * 1.7) * hoverRY;
-    }
-
-    const dx = targetX - posX;
-    const dy = targetY - posY;
-
-    posX += dx * 0.08;
-    posY += dy * 0.08;
-
-    if (Math.abs(dx) > 0.4 || Math.abs(dy) > 0.4) {
-      angle = Math.atan2(dy, dx) * 180 / Math.PI;
-    }
-
-    rocket.style.transform =
-      `translate(${posX}px, ${posY}px) rotate(${angle + 90}deg) translate(-12px, -12px)`;
-
-    requestAnimationFrame(tick);
-  }
-
-  window.addEventListener('resize', () => {
-    targetX = Math.min(targetX, hero.clientWidth);
-    targetY = Math.min(targetY, hero.clientHeight);
-  });
-
-  tick();
-})();
-
 /* Hero title reveal */
 window.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('#hero-title .word').forEach((word, i) => {
@@ -931,6 +756,69 @@ window.addEventListener('scroll', () => {
     }
   }
 
+  /* ---------------- Collaborators and Ongoing Work ---------------- */
+  const collabList = document.getElementById('collab-list');
+  const collabTpl = document.getElementById('collab-template');
+  const addCollabBtn = document.getElementById('edit-add-collab');
+  const COLLAB_KEYS = ['name', 'affiliation', 'work', 'status', 'url'];
+
+  let collabData = [{
+    name: 'Collaborator Name', affiliation: 'Institution / Lab',
+    work: 'One-line description of the ongoing work.', status: 'Ongoing', url: ''
+  }];
+
+  function normaliseCollab(c) {
+    const o = {};
+    COLLAB_KEYS.forEach(k => o[k] = String(c?.[k] ?? '').trim());
+    return o;
+  }
+
+  function readCollabs() {
+    return Array.from(collabList.querySelectorAll('.collab-item')).map(n => {
+      const o = {};
+      COLLAB_KEYS.forEach(k => o[k] = n.querySelector(`[data-field="${k}"]`).textContent.trim());
+      return o;
+    });
+  }
+
+  function renderCollabs() {
+    collabList.replaceChildren();
+    collabData.forEach((c, i) => {
+      const node = collabTpl.content.firstElementChild.cloneNode(true);
+      COLLAB_KEYS.forEach(k => {
+        const el = node.querySelector(`[data-field="${k}"]`);
+        el.textContent = c[k];
+        if (editMode) makeEditable(el);
+        else if (!c[k]) el.hidden = true;
+      });
+      if (!editMode && c.url) {
+        const a = document.createElement('a');
+        a.href = /^https?:\/\//.test(c.url) ? c.url : 'https://' + c.url;
+        a.target = '_blank'; a.rel = 'noopener'; a.className = 'draw-link';
+        a.textContent = c.url.replace(/^https?:\/\//, '');
+        node.querySelector('[data-field="url"]').replaceChildren(a);
+      }
+      if (editMode) {
+        const d = node.querySelector('.collab-delete');
+        d.hidden = false;
+        d.addEventListener('click', () => {
+          if (!confirm('Delete this entry?')) return;
+          collabData = readCollabs();
+          collabData.splice(i, 1);
+          renderCollabs();
+        });
+      }
+      collabList.appendChild(node);
+    });
+    addCollabBtn.hidden = !editMode;
+  }
+
+  addCollabBtn.addEventListener('click', () => {
+    collabData = readCollabs();
+    collabData.push({ name: 'Name', affiliation: 'Institution', work: 'Ongoing work', status: 'Ongoing', url: '' });
+    renderCollabs();
+  });
+
   function applyContent(data) {
     if (data && typeof data === 'object') {
       editables().forEach(element => {
@@ -944,9 +832,14 @@ window.addEventListener('scroll', () => {
         // An empty array is valid: it means there are no research cards.
         researchData = data.research.map(normaliseResearch);
       }
+
+      if (Array.isArray(data.collaborators)) {
+        collabData = data.collaborators.map(normaliseCollab);
+      }
     }
 
     renderResearch();
+    renderCollabs();
   }
 
   function collectContent() {
@@ -967,6 +860,8 @@ window.addEventListener('scroll', () => {
         abstract: field('abstract').innerHTML.trim()
       };
     });
+
+    data.collaborators = editMode ? readCollabs() : collabData;
 
     return data;
   }
@@ -1129,6 +1024,7 @@ window.addEventListener('scroll', () => {
 
     editables().forEach(makeEditable);
     renderResearch();
+    renderCollabs();
     buildToolbar();
   }
 
@@ -1152,6 +1048,7 @@ window.addEventListener('scroll', () => {
     .catch(error => {
       console.warn('Could not load content.json. Using built-in defaults.', error);
       renderResearch();
+      renderCollabs();
     })
     .finally(() => {
       if (isEditMode()) enableEditMode();

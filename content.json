@@ -56,21 +56,5 @@
       ],
       "abstract": "Keywords: Scientific Machine Learning, Viscoelasticity, Stiff Dynamical Systems, Rayleigh-Plesset equation, PINNs."
     }
-  ],
-  "collaborators": [
-    {
-      "name": "Dr. Rahil Valani",
-      "affiliation": "Rudolf Peierls Centre for Theoretical Physics, University of Oxford",
-      "work": "Active particle dynamics in MHD flows.",
-      "status": "Ongoing",
-      "url": ""
-    },
-    {
-      "name": "Aritra Roy",
-      "affiliation": "IIT Bombay",
-      "work": "Bubble dynamics in viscoelastic fluids.",
-      "status": "Ongoing",
-      "url": ""
-    }
   ]
 }

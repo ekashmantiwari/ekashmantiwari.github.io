@@ -57,4 +57,13 @@
       "abstract": "Keywords: Scientific Machine Learning, Viscoelasticity, Stiff Dynamical Systems, Rayleigh-Plesset equation, PINNs."
     }
   ]
+  "publications": [
+  {
+    "title": "Chaos Made Visible: Active particles trace Lorenz-like attractors in physical space",
+    "authors": "Rahil N. Valani",
+    "venue": "arXiV, under review",
+    "year": "2026",
+    "url": "https://arxiv.org/html/2610.32640v1"
+  }
+]
 }

@@ -254,7 +254,6 @@ nav.scrolled .nav-tabs .draw-link.active { mix-blend-mode: normal; }
     <ul class="nav-tabs nav-extra hidden md:flex items-center gap-x-14 font-mono text-[11px] tracking-[0.18em] uppercase">
       <li><a href="#about" class="nav-invert draw-link">About</a></li>
       <li><a href="#highlight" class="nav-invert draw-link">Research</a></li>
-      <li><a href="#collaborators" class="nav-invert draw-link">Ongoing</a></li>
       <li><a href="#education" class="nav-invert draw-link">Education</a></li>
       <li><a href="#experience" class="nav-invert draw-link">Experience</a></li>
       <li><a href="#positions" class="nav-invert draw-link">Roles</a></li>
@@ -282,7 +281,6 @@ nav.scrolled .nav-tabs .draw-link.active { mix-blend-mode: normal; }
     <ul class="flex flex-col gap-6 font-serif text-3xl">
       <li><a href="#about" class="menu-link">About</a></li>
       <li><a href="#highlight" class="menu-link">Research</a></li>
-      <li><a href="#collaborators" class="menu-link">Ongoing</a></li>
       <li><a href="#education" class="menu-link">Education</a></li>
       <li><a href="#experience" class="menu-link">Experience</a></li>
       <li><a href="#positions" class="menu-link">Roles</a></li>
@@ -381,6 +379,21 @@ nav.scrolled .nav-tabs .draw-link.active { mix-blend-mode: normal; }
         <button id="see-all-research" hidden class="mt-8 font-mono text-xs tracking-widest uppercase draw-link">
           See all research &rarr;
         </button>
+
+        <!-- Publications subsection -->
+        <div id="publications" class="mt-20 pt-10 border-t border-ink/25">
+          <div class="flex items-baseline justify-between gap-4 flex-wrap">
+            <h3 class="font-serif text-2xl md:text-3xl" data-edit-id="publications-heading">Publications</h3>
+            <button id="edit-add-pub" hidden
+              class="font-mono text-[11px] tracking-widest uppercase border border-rust text-rust px-3 py-2 rounded-md hover:bg-rust hover:text-paper transition-colors">
+              + Add publication
+            </button>
+          </div>
+          <div id="pub-list" class="mt-6 border-b border-ink/25"></div>
+          <p id="pub-empty" hidden class="mt-6 font-mono text-xs tracking-widest uppercase text-ink/70">
+            No publications yet.
+          </p>
+        </div>
       </div>
     </div>
   </section>
@@ -406,39 +419,23 @@ nav.scrolled .nav-tabs .draw-link.active { mix-blend-mode: normal; }
     </article>
   </template>
 
-  <section id="collaborators" class="max-w-6xl mx-auto px-6 md:px-10 py-24 md:py-32 border-b border-ink/25">
-    <div class="grid grid-cols-1 md:grid-cols-12 gap-12">
-      <div class="md:col-span-3 fade-up">
-        <span class="font-mono text-xs text-ink/70 num-mark">03</span>
-        <h2 class="font-serif text-3xl mt-2" data-edit-id="collaborators-heading">Collaborators and Ongoing Work</h2>
-        <button id="edit-add-collab" hidden
-          class="mt-6 font-mono text-[11px] tracking-widest uppercase border border-rust text-rust px-3 py-2 rounded-md hover:bg-rust hover:text-paper transition-colors">
-          + Add entry
-        </button>
-      </div>
-      <div class="md:col-span-9">
-        <div id="collab-list" class="border-b border-ink/25"></div>
-      </div>
-    </div>
-  </section>
-
-  <template id="collab-template">
-    <div class="card collab-item grid grid-cols-1 sm:grid-cols-[1fr_auto] gap-x-6 gap-y-2 py-7 items-baseline">
+  <template id="pub-template">
+    <div class="card pub-item grid grid-cols-1 sm:grid-cols-[1fr_auto] gap-x-6 gap-y-2 py-7 items-baseline">
       <div>
-        <p class="font-serif text-xl" data-field="name"></p>
-        <p class="text-sm text-ink/90 mt-1" data-field="affiliation"></p>
-        <p class="text-[15px] leading-relaxed text-ink/90 mt-3" data-field="work"></p>
+        <p class="font-serif text-xl leading-snug" data-field="title"></p>
+        <p class="text-sm text-ink/90 mt-2" data-field="authors"></p>
+        <p class="font-mono text-xs tracking-widest uppercase text-ink/70 mt-3" data-field="venue"></p>
         <p class="font-mono text-xs mt-3" data-field="url"></p>
-        <button class="collab-delete mt-4 font-mono text-[11px] tracking-widest uppercase text-rust/80 hover:text-rust" hidden>Delete this entry</button>
+        <button class="pub-delete mt-4 font-mono text-[11px] tracking-widest uppercase text-rust/80 hover:text-rust" hidden>Delete this publication</button>
       </div>
-      <span class="font-mono text-xs text-rust whitespace-nowrap" data-field="status"></span>
+      <span class="font-mono text-xs text-rust whitespace-nowrap" data-field="year"></span>
     </div>
   </template>
 
   <section id="education" class="max-w-6xl mx-auto px-6 md:px-10 py-24 md:py-32 border-b border-ink/25">
     <div class="grid grid-cols-1 md:grid-cols-12 gap-12">
       <div class="md:col-span-3 fade-up">
-        <span class="font-mono text-xs text-ink/70 num-mark">04</span>
+        <span class="font-mono text-xs text-ink/70 num-mark">03</span>
         <h2 class="font-serif text-3xl mt-2" data-edit-id="education-heading">Education</h2>
       </div>
 
@@ -476,7 +473,7 @@ nav.scrolled .nav-tabs .draw-link.active { mix-blend-mode: normal; }
   <section id="experience" class="max-w-6xl mx-auto px-6 md:px-10 py-24 md:py-32 border-b border-ink/25">
     <div class="grid grid-cols-1 md:grid-cols-12 gap-12">
       <div class="md:col-span-3 fade-up">
-        <span class="font-mono text-xs text-ink/70 num-mark">05</span>
+        <span class="font-mono text-xs text-ink/70 num-mark">04</span>
         <h2 class="font-serif text-3xl mt-2" data-edit-id="experience-heading">Experience</h2>
       </div>
 
@@ -503,7 +500,7 @@ nav.scrolled .nav-tabs .draw-link.active { mix-blend-mode: normal; }
   <section id="positions" class="max-w-6xl mx-auto px-6 md:px-10 py-24 md:py-32 border-b border-ink/25">
     <div class="grid grid-cols-1 md:grid-cols-12 gap-12">
       <div class="md:col-span-3 fade-up">
-        <span class="font-mono text-xs text-ink/70 num-mark">06</span>
+        <span class="font-mono text-xs text-ink/70 num-mark">05</span>
         <h2 class="font-serif text-3xl mt-2" data-edit-id="positions-heading">Roles</h2>
       </div>
 
@@ -538,7 +535,7 @@ nav.scrolled .nav-tabs .draw-link.active { mix-blend-mode: normal; }
   <section id="contact" class="max-w-6xl mx-auto px-6 md:px-10 py-24 md:py-32 border-b border-ink/25">
     <div class="grid grid-cols-1 md:grid-cols-12 gap-12">
       <div class="md:col-span-3 fade-up">
-        <span class="font-mono text-xs text-ink/70 num-mark">07</span>
+        <span class="font-mono text-xs text-ink/70 num-mark">06</span>
         <h2 class="font-serif text-3xl mt-2" data-edit-id="contact-heading">Contact</h2>
       </div>
 
@@ -756,67 +753,81 @@ window.addEventListener('scroll', () => {
     }
   }
 
-  /* ---------------- Collaborators and Ongoing Work ---------------- */
-  const collabList = document.getElementById('collab-list');
-  const collabTpl = document.getElementById('collab-template');
-  const addCollabBtn = document.getElementById('edit-add-collab');
-  const COLLAB_KEYS = ['name', 'affiliation', 'work', 'status', 'url'];
+  /* ---------------- Publications ---------------- */
+  const pubList = document.getElementById('pub-list');
+  const pubTpl = document.getElementById('pub-template');
+  const pubEmpty = document.getElementById('pub-empty');
+  const addPubBtn = document.getElementById('edit-add-pub');
+  const PUB_KEYS = ['title', 'authors', 'venue', 'year', 'url'];
 
-  let collabData = [{
-    name: 'Collaborator Name', affiliation: 'Institution / Lab',
-    work: 'One-line description of the ongoing work.', status: 'Ongoing', url: ''
-  }];
+  let pubData = [];
 
-  function normaliseCollab(c) {
+  function normalisePub(p) {
     const o = {};
-    COLLAB_KEYS.forEach(k => o[k] = String(c?.[k] ?? '').trim());
+    PUB_KEYS.forEach(k => o[k] = String(p?.[k] ?? '').trim());
     return o;
   }
 
-  function readCollabs() {
-    return Array.from(collabList.querySelectorAll('.collab-item')).map(n => {
+  function readPubs() {
+    return Array.from(pubList.querySelectorAll('.pub-item')).map(n => {
       const o = {};
-      COLLAB_KEYS.forEach(k => o[k] = n.querySelector(`[data-field="${k}"]`).textContent.trim());
+      PUB_KEYS.forEach(k => o[k] = n.querySelector(`[data-field="${k}"]`).textContent.trim());
       return o;
     });
   }
 
-  function renderCollabs() {
-    collabList.replaceChildren();
-    collabData.forEach((c, i) => {
-      const node = collabTpl.content.firstElementChild.cloneNode(true);
-      COLLAB_KEYS.forEach(k => {
+  function renderPubs() {
+    pubList.replaceChildren();
+
+    pubData.forEach((p, i) => {
+      const node = pubTpl.content.firstElementChild.cloneNode(true);
+
+      PUB_KEYS.forEach(k => {
         const el = node.querySelector(`[data-field="${k}"]`);
-        el.textContent = c[k];
+        el.textContent = p[k];
         if (editMode) makeEditable(el);
-        else if (!c[k]) el.hidden = true;
+        else if (!p[k]) el.hidden = true;
       });
-      if (!editMode && c.url) {
+
+      if (!editMode && p.url) {
         const a = document.createElement('a');
-        a.href = /^https?:\/\//.test(c.url) ? c.url : 'https://' + c.url;
-        a.target = '_blank'; a.rel = 'noopener'; a.className = 'draw-link';
-        a.textContent = c.url.replace(/^https?:\/\//, '');
+        a.href = /^https?:\/\//.test(p.url) ? p.url : 'https://' + p.url;
+        a.target = '_blank';
+        a.rel = 'noopener';
+        a.className = 'draw-link';
+        a.textContent = p.url.replace(/^https?:\/\//, '');
         node.querySelector('[data-field="url"]').replaceChildren(a);
       }
+
       if (editMode) {
-        const d = node.querySelector('.collab-delete');
+        const d = node.querySelector('.pub-delete');
         d.hidden = false;
         d.addEventListener('click', () => {
-          if (!confirm('Delete this entry?')) return;
-          collabData = readCollabs();
-          collabData.splice(i, 1);
-          renderCollabs();
+          if (!confirm('Delete this publication?')) return;
+          pubData = readPubs();
+          pubData.splice(i, 1);
+          renderPubs();
         });
       }
-      collabList.appendChild(node);
+
+      pubList.appendChild(node);
     });
-    addCollabBtn.hidden = !editMode;
+
+    pubList.hidden = pubData.length === 0;
+    pubEmpty.hidden = editMode || pubData.length > 0;
+    addPubBtn.hidden = !editMode;
   }
 
-  addCollabBtn.addEventListener('click', () => {
-    collabData = readCollabs();
-    collabData.push({ name: 'Name', affiliation: 'Institution', work: 'Ongoing work', status: 'Ongoing', url: '' });
-    renderCollabs();
+  addPubBtn.addEventListener('click', () => {
+    pubData = readPubs();
+    pubData.push({
+      title: 'Publication title',
+      authors: 'Author One, Author Two',
+      venue: 'Journal / Conference',
+      year: '2026',
+      url: ''
+    });
+    renderPubs();
   });
 
   function applyContent(data) {
@@ -833,13 +844,13 @@ window.addEventListener('scroll', () => {
         researchData = data.research.map(normaliseResearch);
       }
 
-      if (Array.isArray(data.collaborators)) {
-        collabData = data.collaborators.map(normaliseCollab);
+      if (Array.isArray(data.publications)) {
+        pubData = data.publications.map(normalisePub);
       }
     }
 
     renderResearch();
-    renderCollabs();
+    renderPubs();
   }
 
   function collectContent() {
@@ -861,7 +872,7 @@ window.addEventListener('scroll', () => {
       };
     });
 
-    data.collaborators = editMode ? readCollabs() : collabData;
+    data.publications = editMode ? readPubs() : pubData;
 
     return data;
   }
@@ -1024,7 +1035,7 @@ window.addEventListener('scroll', () => {
 
     editables().forEach(makeEditable);
     renderResearch();
-    renderCollabs();
+    renderPubs();
     buildToolbar();
   }
 
@@ -1048,7 +1059,7 @@ window.addEventListener('scroll', () => {
     .catch(error => {
       console.warn('Could not load content.json. Using built-in defaults.', error);
       renderResearch();
-      renderCollabs();
+      renderPubs();
     })
     .finally(() => {
       if (isEditMode()) enableEditMode();

@@ -43,7 +43,7 @@
   "contact-orcid": "orcid.org/0009-0008-9121-0930",
   "footer-copyright": "© 2026 Ekashman Tiwari",
   "footer-tagline": "Aerospace Engineering, IIST Thiruvananthapuram",
-  "research": [
+    "research": [
     {
       "date": "14–16 Oct 2026 · IIT Ropar, India",
       "title": "“Learning bubble dynamics in viscoelastic fluids: A data-assisted PINN”",
@@ -56,14 +56,14 @@
       ],
       "abstract": "Keywords: Scientific Machine Learning, Viscoelasticity, Stiff Dynamical Systems, Rayleigh-Plesset equation, PINNs."
     }
-  ]
+  ],
   "publications": [
-  {
-    "title": "Chaos Made Visible: Active particles trace Lorenz-like attractors in physical space",
-    "authors": "Rahil N. Valani",
-    "venue": "arXiV, under review",
-    "year": "2026",
-    "url": "https://arxiv.org/html/2610.32640v1"
-  }
-]
+    {
+      "title": "Chaos Made Visible: Active particles trace Lorenz-like attractors in physical space",
+      "authors": "Rahil N. Valani",
+      "venue": "arXiv, under review",
+      "year": "2026",
+      "url": "https://arxiv.org/html/2610.32640v1"
+    }
+  ]
 }
